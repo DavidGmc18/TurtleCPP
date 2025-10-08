@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include "renderer.hpp"
 #include <cmath>
 #include <cstdint>
