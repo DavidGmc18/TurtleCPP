@@ -50,4 +50,6 @@ public:
     void go_to(float x, float y);
 
     void penwidth(float w);
+
+    void circle(float radius, float extent = 360, int steps = 90);
 };

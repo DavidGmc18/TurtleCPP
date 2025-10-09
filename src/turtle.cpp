@@ -76,3 +76,23 @@ void Turtle::go_to(float x, float y) {
 void Turtle::penwidth(float w) {
     points.back().thickness = w;
 }
+
+void Turtle::circle(float radius, float extent, int steps) {
+    float angle = extent / steps;
+    float distane = 2 * sin((angle / 2) * M_PI / 180.0f) * radius;
+    if (distane > 0) {
+        right(angle / 2);
+        for (int i = 0; i < steps; ++i) {
+            left(angle);
+            forward(distane);
+        }
+        left(angle / 2);
+    } else {
+        left(angle / 2);
+        for (int i = 0; i < steps; ++i) {
+            right(angle);
+            forward(-distane);
+        }
+        right(angle / 2);
+    }
+}
