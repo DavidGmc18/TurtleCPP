@@ -82,8 +82,12 @@ void mainloop(int framerate) {
     SDL_Event e;
 
     std::vector<uint> step(Turtle::get_all_turtles().size(), 0);
-    std::vector<Uint32> step_start(Turtle::get_all_turtles().size(), 0);
-    std::vector<bool> rst_step_start(Turtle::get_all_turtles().size(), true);
+    std::vector<Uint32> start(Turtle::get_all_turtles().size(), 0);
+    for (int idx = 0; idx < Turtle::get_all_turtles().size(); ++idx) {
+        start[idx] = SDL_GetTicks();
+    }
+
+    std::vector<float> distance(Turtle::get_all_turtles().size(), 0);
 
     const float frameDelay = 1000.0f / framerate;
     while (running) {
@@ -98,35 +102,30 @@ void mainloop(int framerate) {
 
         for (int idx = 0; idx < Turtle::get_all_turtles().size(); ++idx) {
             Turtle* t = Turtle::get_all_turtles()[idx];
-            float k = 0.0f;
-
             for (uint i = 0; i + 1 < t->get_points().size(); ++i) {
-                if (rst_step_start[idx]) {
-                    step_start[idx] = SDL_GetTicks();
-                    rst_step_start[idx] = false;
-                }
-
-                float x1, y1, x2, y2;
+                float x1 = t->get_points()[i].x + float(screen.x)/2;
+                float y1 = -(t->get_points()[i].y) + float(screen.y)/2;
+                float x2, y2;
                 if (t->speed == 0 || i < step[idx]) {
                     if (t->speed == 0) step[idx]++;
-                    x1 = t->get_points()[i].x + float(screen.x)/2;
-                    y1 = -(t->get_points()[i].y) + float(screen.y)/2;
                     x2 = t->get_points()[i+1].x + float(screen.x)/2;
                     y2 = -(t->get_points()[i+1].y) + float(screen.y)/2;
                 } else if (i == step[idx]) {
                     float dx = t->get_points()[i+1].x - t->get_points()[i].x;
                     float dy = -(t->get_points()[i+1].y) + (t->get_points()[i].y);
                     float d = sqrtf(pow(dx, 2) + pow(dy, 2));
-                    float inc = t->speed / d;
-                    float r = float(SDL_GetTicks() - step_start[idx]) / 1000 * inc + k;
-                    if (r > 1) {
-                        k = r - 1;
-                        r = 1;
+
+                    float wd = t->speed * (SDL_GetTicks() - start[idx]) / 1000.0f;
+                    float r = (wd - distance[idx]) / d;
+
+                    if (r >= 1) {
                         step[idx]++;
-                        rst_step_start[idx] = true;
+                        r = 1;
+                        distance[idx] += d;
+                    } else if (r < 0) {
+                        r = 0;
                     }
-                    x1 = t->get_points()[i].x + float(screen.x)/2;
-                    y1 = -(t->get_points()[i].y) + float(screen.y)/2;
+
                     x2 = dx * r + x1;
                     y2 = dy * r + y1;
                 }
