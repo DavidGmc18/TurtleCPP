@@ -14,10 +14,6 @@ void screen_size(int x, int y) {
     screen_y = y;
 }
 
-void bgcolor(uint32_t color) {
-    screen_rgba = color;
-}
-
 void bgcolor(Color color) {
     screen_rgba = color.rgba;
 }
