@@ -2,12 +2,12 @@
 
 int main() {
     screen_size(1000, 750);
-    bgcolor(150, 150, 150);
+    bgcolor("lightgrey");
 
     Turtle t;
     t.set_speed(200);
 
-    t.color(255, 0, 0);
+    t.color({255, 0, 0});
     t.forward(100);
 
     t.right(45);
@@ -18,7 +18,7 @@ int main() {
 
     t.pendown();
     t.penwidth(5);
-    t.pencolor(0, 255, 0);
+    t.pencolor({0, 255, 0});
     t.left(45);
     t.backward(100);
 

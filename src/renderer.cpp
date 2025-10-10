@@ -18,8 +18,8 @@ void bgcolor(uint32_t color) {
     screen_rgba = color;
 }
 
-void bgcolor(uint8_t r, uint8_t g, uint8_t b) {
-    screen_rgba = ((r & 0xFF) << 24) | ((g & 0xFF) << 16) | ((b & 0xFF) << 8) | 0xFF;
+void bgcolor(Color color) {
+    screen_rgba = color.rgba;
 }
 
 void draw_turtle(SDL_Renderer* renderer, float x, float y, float angle, Uint32 rgba) {

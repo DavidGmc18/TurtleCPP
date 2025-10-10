@@ -1,4 +1,5 @@
 #include "turtle.hpp"
+#include "color.hpp"
 
 std::vector<Turtle*> Turtle::all_turtles = {};
 
@@ -46,20 +47,12 @@ void Turtle::pendown() {
     points.back().pen = true;
 }
 
-void Turtle::pencolor(uint32_t color) {
-    points.back().rgba = color;
+void Turtle::pencolor(Color color) {
+    points.back().rgba = color.rgba;
 }
 
-void Turtle::pencolor(uint8_t r, uint8_t g, uint8_t b) {
-    points.back().rgba = ((r & 0xFF) << 24) | ((g & 0xFF) << 16) | ((b & 0xFF) << 8) | 0xFF;
-}
-
-void Turtle::color(uint32_t color) {
-    rgba = color;
-}
-
-void Turtle::color(uint8_t r, uint8_t g, uint8_t b) {
-    rgba = ((r & 0xFF) << 24) | ((g & 0xFF) << 16) | ((b & 0xFF) << 8) | 0xFF;
+void Turtle::color(Color color) {
+    rgba = color.rgba;
 }
 
 void Turtle::set_speed(int v) {
@@ -76,23 +69,6 @@ void Turtle::go_to(float x, float y) {
 void Turtle::penwidth(float w) {
     points.back().thickness = w;
 }
-
-void Turtle::begin_fill() {
-    points.back().fill = true;
-}
-
-void Turtle::end_fill() {
-    points.back().fill = false;
-}
-
-void Turtle::fillcolor(uint32_t color) {
-    points.back().fill_rgba = color;
-}
-
-void Turtle::fillcolor(uint8_t r, uint8_t g, uint8_t b) {
-    points.back().fill_rgba = ((r & 0xFF) << 24) | ((g & 0xFF) << 16) | ((b & 0xFF) << 8) | 0xFF;
-}
-
 
 void Turtle::circle(float radius, float extent, int steps) {
     float angle = extent / steps;
@@ -112,4 +88,16 @@ void Turtle::circle(float radius, float extent, int steps) {
         }
         right(angle / 2);
     }
+}
+
+void Turtle::begin_fill() {
+    points.back().fill = true;
+}
+
+void Turtle::end_fill() {
+    points.back().fill = false;
+}
+
+void Turtle::fillcolor(Color color) {
+    points.back().fill_rgba = color.rgba;
 }

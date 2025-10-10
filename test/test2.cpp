@@ -2,7 +2,7 @@
 
 int main() {
     screen_size(1000, 750);
-    bgcolor(150, 150, 150);
+    bgcolor({150, 150, 150});
 
     Turtle t1, t2, t3;
 
@@ -10,9 +10,9 @@ int main() {
     t2.set_speed(100);
     t3.set_speed(100);
 
-    t1.color(255, 0, 0);
-    t2.color(0, 255, 0);
-    t3.color(0, 0, 255);
+    t1.color({255, 0, 0});
+    t2.color({0, 255, 0});
+    t3.color({0, 0, 255});
 
     t1.penup();
     t2.penup();

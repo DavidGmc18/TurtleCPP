@@ -1,6 +1,7 @@
 #pragma once
 
 #include "renderer.hpp"
+#include "color.hpp"
 #include <cmath>
 #include <cstdint>
 #include <sys/types.h>
@@ -41,11 +42,9 @@ public:
     void penup();
     void pendown();
 
-    void pencolor(uint32_t rgba_);
-    void pencolor(uint8_t r, uint8_t g, uint8_t b);
+    void pencolor(Color color);
 
-    void color(uint32_t rgba_);
-    void color(uint8_t r, uint8_t g, uint8_t b);
+    void color(Color color);
 
     void set_speed(int v);
 
@@ -57,7 +56,5 @@ public:
 
     void begin_fill();
     void end_fill();
-    void fillcolor(uint32_t rgba_);
-    void fillcolor(uint8_t r, uint8_t g, uint8_t b);
-
+    void fillcolor(Color color);
 };

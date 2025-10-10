@@ -7,7 +7,7 @@ int main() {
     
     t.circle(-50, 180, 18);
 
-    t.fillcolor(255, 0, 0);
+    t.fillcolor({255, 0, 0});
 
     t.begin_fill();
     t.circle(100, 180, 6);
@@ -17,6 +17,7 @@ int main() {
     t.forward(300);
 
     t.right(45);
+    t.fillcolor("green");
     t.begin_fill();
     t.circle(150);
 
