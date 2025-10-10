@@ -5,25 +5,21 @@
 #include <SDL2/SDL2_gfxPrimitives.h>
 #include <cstring>
 
-struct Screen {
-    int x;
-    int y;
-    uint32_t rgba;
-};
-
-static Screen screen = {};
+static int screen_x = 800;
+static int screen_y = 600;
+static int screen_rgba = 0xFFFFFFFF;
 
 void screen_size(int x, int y) {
-    screen.x = x;
-    screen.y = y;
+    screen_x = x;
+    screen_y = y;
 }
 
 void bgcolor(uint32_t color) {
-    screen.rgba = color;
+    screen_rgba = color;
 }
 
 void bgcolor(uint8_t r, uint8_t g, uint8_t b) {
-    screen.rgba = ((r & 0xFF) << 24) | ((g & 0xFF) << 16) | ((b & 0xFF) << 8) | 0xFF;
+    screen_rgba = ((r & 0xFF) << 24) | ((g & 0xFF) << 16) | ((b & 0xFF) << 8) | 0xFF;
 }
 
 void draw_turtle(SDL_Renderer* renderer, float x, float y, float angle, Uint32 rgba) {
@@ -63,7 +59,7 @@ void mainloop(int framerate) {
         exit(EXIT_FAILURE);
     }
 
-    window = SDL_CreateWindow("Turtle", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screen.x, screen.y, SDL_WINDOW_SHOWN);
+    window = SDL_CreateWindow("Turtle", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screen_x, screen_y, SDL_WINDOW_SHOWN);
     if (!window) {
         printf("SDL_CreateWindow Error: %s\n", SDL_GetError());
         SDL_Quit();
@@ -97,19 +93,19 @@ void mainloop(int framerate) {
             if (e.type == SDL_QUIT) running = false;
         }
 
-        SDL_SetRenderDrawColor(renderer, screen.rgba >> 24, screen.rgba >> 16, screen.rgba >> 8, screen.rgba);
+        SDL_SetRenderDrawColor(renderer, screen_rgba >> 24, screen_rgba >> 16, screen_rgba >> 8, screen_rgba);
         SDL_RenderClear(renderer);
 
         for (int idx = 0; idx < Turtle::get_all_turtles().size(); ++idx) {
             Turtle* t = Turtle::get_all_turtles()[idx];
             for (uint i = 0; i + 1 < t->get_points().size(); ++i) {
-                float x1 = t->get_points()[i].x + float(screen.x)/2;
-                float y1 = -(t->get_points()[i].y) + float(screen.y)/2;
+                float x1 = t->get_points()[i].x + float(screen_x)/2;
+                float y1 = -(t->get_points()[i].y) + float(screen_y)/2;
                 float x2, y2;
                 if (t->speed == 0 || i < step[idx]) {
                     if (t->speed == 0) step[idx]++;
-                    x2 = t->get_points()[i+1].x + float(screen.x)/2;
-                    y2 = -(t->get_points()[i+1].y) + float(screen.y)/2;
+                    x2 = t->get_points()[i+1].x + float(screen_x)/2;
+                    y2 = -(t->get_points()[i+1].y) + float(screen_y)/2;
                 } else if (i == step[idx]) {
                     float dx = t->get_points()[i+1].x - t->get_points()[i].x;
                     float dy = -(t->get_points()[i+1].y) + (t->get_points()[i].y);

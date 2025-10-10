@@ -1,9 +1,6 @@
 #include "turtle.hpp"
 
 int main() {
-    screen_size(1000, 750);
-    bgcolor(150, 150, 150);
-
     Turtle t;
 
     t.set_speed(100);
@@ -15,7 +12,7 @@ int main() {
     t.forward(300);
 
     t.right(45);
-    t.circle(200);
+    t.circle(150);
 
     mainloop();
     return 0;
