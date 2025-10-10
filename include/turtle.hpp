@@ -13,6 +13,8 @@ struct Point {
     bool pen = true;;
     uint32_t rgba = 0x000000FF;
     float thickness = 1;
+    bool fill;
+    uint32_t fill_rgba = 0x000000FF;
 };
 
 class Turtle {
@@ -52,4 +54,10 @@ public:
     void penwidth(float w);
 
     void circle(float radius, float extent = 360, int steps = 90);
+
+    void begin_fill();
+    void end_fill();
+    void fillcolor(uint32_t rgba_);
+    void fillcolor(uint8_t r, uint8_t g, uint8_t b);
+
 };

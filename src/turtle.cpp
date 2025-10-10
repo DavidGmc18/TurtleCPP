@@ -77,6 +77,23 @@ void Turtle::penwidth(float w) {
     points.back().thickness = w;
 }
 
+void Turtle::begin_fill() {
+    points.back().fill = true;
+}
+
+void Turtle::end_fill() {
+    points.back().fill = false;
+}
+
+void Turtle::fillcolor(uint32_t color) {
+    points.back().fill_rgba = color;
+}
+
+void Turtle::fillcolor(uint8_t r, uint8_t g, uint8_t b) {
+    points.back().fill_rgba = ((r & 0xFF) << 24) | ((g & 0xFF) << 16) | ((b & 0xFF) << 8) | 0xFF;
+}
+
+
 void Turtle::circle(float radius, float extent, int steps) {
     float angle = extent / steps;
     float distane = 2 * sin((angle / 2) * M_PI / 180.0f) * radius;

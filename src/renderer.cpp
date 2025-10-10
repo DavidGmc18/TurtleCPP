@@ -95,6 +95,7 @@ void mainloop(int framerate) {
 
         for (int idx = 0; idx < Turtle::get_all_turtles().size(); ++idx) {
             Turtle* t = Turtle::get_all_turtles()[idx];
+            bool prev_fill = false;
             for (uint i = 0; i + 1 < t->get_points().size(); ++i) {
                 float x1 = t->get_points()[i].x + float(screen_x)/2;
                 float y1 = -(t->get_points()[i].y) + float(screen_y)/2;
@@ -121,6 +122,38 @@ void mainloop(int framerate) {
 
                     x2 = dx * r + x1;
                     y2 = dy * r + y1;
+                }
+
+                if (!prev_fill && t->get_points()[i].fill) {
+                    prev_fill = true;
+
+                    for (uint j = i + 1; j + 1 < t->get_points().size(); ++j) {
+                        float x3 = t->get_points()[j].x + float(screen_x)/2;
+                        float y3 = -(t->get_points()[j].y) + float(screen_y)/2;
+                        float x4, y4;
+                        if (t->speed == 0 || j < step[idx]) {
+                            x4 = t->get_points()[j + 1].x + float(screen_x)/2;
+                            y4 = -(t->get_points()[j + 1].y) + float(screen_y)/2;
+                        } else if (j == step[idx]) {      
+                            float dx = t->get_points()[j + 1].x - t->get_points()[j].x;
+                            float dy = -(t->get_points()[j + 1].y) + (t->get_points()[j].y);
+                            float d = sqrtf(pow(dx, 2) + pow(dy, 2));
+
+                            float wd = t->speed * (SDL_GetTicks() - start[idx]) / 1000.0f;
+                            float r = std::min(std::max((wd - distance[idx]) / d, 0.0f), 1.0f);
+                            
+                            x4 = dx * r + x3;
+                            y4 = dy * r + y3; 
+                        }
+
+                        if (j <= step[idx] || t->speed == 0) {
+                            filledTrigonRGBA(renderer, x1, y1, x3, y3, x4, y4, t->get_points()[i].fill_rgba >> 24, t->get_points()[i].fill_rgba >> 16, t->get_points()[i].fill_rgba >> 8, t->get_points()[i].fill_rgba);
+                        }   
+
+                        if (!t->get_points()[j].fill) break; 
+                    }
+                } else if (prev_fill && !t->get_points()[i].fill) {
+                    prev_fill = false;
                 }
 
                 if ((i <= step[idx] || t->speed == 0) && t->get_points()[i].pen) {
