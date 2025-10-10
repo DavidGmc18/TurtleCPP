@@ -167,8 +167,10 @@ void mainloop(int framerate) {
                     }
                 }
                 
-                if (i == step[idx] || (i < step[idx] && i + 2 == t->get_points().size())) {
+                if (i == step[idx]) {
                     draw_turtle(renderer, x2, y2, t->get_points()[i].angle, t->rgba);
+                } else if (i < step[idx] && i + 2 == t->get_points().size()) {
+                    draw_turtle(renderer, x2, y2, t->get_points()[i + 1].angle, t->rgba);
                 }
             }
         }

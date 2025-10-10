@@ -20,6 +20,8 @@ int main() {
     t.begin_fill();
     t.circle(150);
 
+    t.left(90);
+
     mainloop();
     return 0;
 }
