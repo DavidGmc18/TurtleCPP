@@ -42,11 +42,8 @@ void draw_turtle(SDL_Renderer* renderer, float x, float y, float angle, Uint32 r
     float x4 = x + w*cos(angle) - sb*sin(angle);
     float y4 = y + w*sin(angle) + sb*cos(angle);
 
-    SDL_SetRenderDrawColor(renderer, rgba >> 24, rgba >> 16, rgba >> 8, rgba);
-    SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
-    SDL_RenderDrawLine(renderer, x2, y2, x3, y3);
-    SDL_RenderDrawLine(renderer, x3, y3, x4, y4);
-    SDL_RenderDrawLine(renderer, x4, y4, x1, y1);
+    filledTrigonRGBA(renderer, x1, y1, x2, y2, x3, y3, rgba >> 24, rgba >> 16, rgba >> 8, rgba);
+    filledTrigonRGBA(renderer, x1, y1, x4, y4, x3, y3, rgba >> 24, rgba >> 16, rgba >> 8, rgba);
 }
 
 void mainloop(int framerate) {
