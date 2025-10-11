@@ -2,6 +2,7 @@
 
 set -e
 
+mkdir -p build
 cd "build" || exit 1
 
 find ../src -type f \( -name '*.cpp' \) | while read -r f; do
