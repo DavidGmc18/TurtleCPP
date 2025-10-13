@@ -11,18 +11,16 @@ struct Point {
     float x = 0.0f;
     float y = 0.0f;
     float angle = 0.0f;
-    bool pen = true;;
     uint32_t rgba = 0x000000FF;
     float thickness = 1;
-    bool fill;
-    uint32_t fill_rgba = 0x000000FF;
+    uint32_t fill_rgba = 0x00000000;
 };
 
 class Turtle {
 protected:
     static std::vector<Turtle*> all_turtles;
 
-    std::vector<Point> points = {Point{0, 0, 0, true}};
+    std::vector<Point> points = {Point{}};
 
 public:
     uint speed = 100;
@@ -30,7 +28,7 @@ public:
 
     Turtle();
 
-    static const std::vector<Turtle*>& get_all_turtles();
+    static const std::vector<Turtle*>& turtles();
     std::vector<Point> get_points();
 
     void forward(float d);

@@ -1,3 +1,4 @@
+#ifdef BACKEND_SDL
 #include "renderer.hpp"
 #include "turtle.hpp"
 #include <SDL2/SDL_render.h>
@@ -5,10 +6,10 @@
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_video.h>
 #include <SDL2/SDL2_gfxPrimitives.h>
-#include <algorithm>
 #include <cstring>
 
 #ifdef DEBUG
+#include <algorithm>
 #include <numeric>
 #endif
 
@@ -77,13 +78,13 @@ void mainloop(int framerate) {
     bool running = true;
     SDL_Event e;
 
-    std::vector<uint> step(Turtle::get_all_turtles().size(), 0);
-    std::vector<Uint32> start(Turtle::get_all_turtles().size(), 0);
-    for (int idx = 0; idx < Turtle::get_all_turtles().size(); ++idx) {
+    std::vector<uint> step(Turtle::turtles().size(), 0);
+    std::vector<Uint32> start(Turtle::turtles().size(), 0);
+    for (int idx = 0; idx < Turtle::turtles().size(); ++idx) {
         start[idx] = SDL_GetTicks();
     }
 
-    std::vector<float> distance(Turtle::get_all_turtles().size(), 0);
+    std::vector<float> distance(Turtle::turtles().size(), 0);
 
     #ifdef DEBUG
     constexpr int frameTimesSize = 100;
@@ -101,8 +102,8 @@ void mainloop(int framerate) {
         SDL_SetRenderDrawColor(renderer, screen_rgba >> 24, screen_rgba >> 16, screen_rgba >> 8, screen_rgba);
         SDL_RenderClear(renderer);
 
-        for (int idx = 0; idx < Turtle::get_all_turtles().size(); ++idx) {
-            Turtle* t = Turtle::get_all_turtles()[idx];
+        for (int idx = 0; idx < Turtle::turtles().size(); ++idx) {
+            Turtle* t = Turtle::turtles()[idx];
             bool prev_fill = false;
             for (uint i = 0; i + 1 < t->get_points().size(); ++i) {
                 float x1 = t->get_points()[i].x + float(screen_x)/2;
@@ -132,7 +133,7 @@ void mainloop(int framerate) {
                     y2 = dy * r + y1;
                 }
 
-                if (!prev_fill && t->get_points()[i].fill) {
+                if (!prev_fill && (t->get_points()[i].fill_rgba & 0x000000FF)) {
                     prev_fill = true;
 
                     for (uint j = i + 1; j + 1 < t->get_points().size(); ++j) {
@@ -158,13 +159,13 @@ void mainloop(int framerate) {
                             filledTrigonRGBA(renderer, x1, y1, x3, y3, x4, y4, t->get_points()[i].fill_rgba >> 24, t->get_points()[i].fill_rgba >> 16, t->get_points()[i].fill_rgba >> 8, t->get_points()[i].fill_rgba);
                         }   
 
-                        if (!t->get_points()[j].fill) break; 
+                        if (!(t->get_points()[j].fill_rgba & 0x000000FF)) break; 
                     }
-                } else if (prev_fill && !t->get_points()[i].fill) {
+                } else if (prev_fill && !(t->get_points()[i].fill_rgba & 0x000000FF)) {
                     prev_fill = false;
                 }
 
-                if ((i <= step[idx] || t->speed == 0) && t->get_points()[i].pen) {
+                if ((i <= step[idx] || t->speed == 0) && uint8_t(t->get_points()[i].rgba) != 0) {
                     if (t->get_points()[i].thickness == 1) {
                         SDL_SetRenderDrawColor(renderer, t->get_points()[i].rgba >> 24, t->get_points()[i].rgba >> 16, t->get_points()[i].rgba >> 8, t->get_points()[i].rgba);
                         SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
@@ -199,8 +200,9 @@ void mainloop(int framerate) {
             float avg = std::accumulate(frameTimes, frameTimes + frameTimesSize, 0.0f) / frameTimesSize;
             float max = *std::max_element(frameTimes, frameTimes + frameTimesSize);
             float min = *std::min_element(frameTimes, frameTimes + frameTimesSize);
-            printf("Frame time(%i) ->  MIN %fms  AVG %fms  MAX %fms\n", frameTimesSize, min, avg, max);
+            printf("Frame time(%i) ->  MIN %.3fms  AVG %.3fms  MAX %.3fms\n", frameTimesSize, min, avg, max);
         }
         #endif
     }
 }
+#endif

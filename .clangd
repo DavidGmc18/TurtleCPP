@@ -1,5 +1,7 @@
 CompileFlags:
     Add:
-        - -DDEBUG  
-        - -I
-        - ../include
+        - -DDEBUG 
+        - -DBACKEND_SDL
+        - -DBACKEND_GL
+        - -I../include
+        - -I../../include

@@ -7,7 +7,7 @@ Turtle::Turtle() {
     all_turtles.push_back(this);
 }
 
-const std::vector<Turtle*>& Turtle::get_all_turtles() {
+const std::vector<Turtle*>& Turtle::turtles() {
     return all_turtles;
 }
 
@@ -40,15 +40,17 @@ void Turtle::right(float a) {
 }
 
 void Turtle::penup() {
-    points.back().pen = false;
+    points.back().rgba &= 0xFFFFFF00;
 }
 
 void Turtle::pendown() {
-    points.back().pen = true;
+    points.back().rgba &= 0xFFFFFF00;
+    points.back().rgba |= 0xFF;
 }
 
 void Turtle::pencolor(Color color) {
-    points.back().rgba = color.rgba;
+    uint8_t alpha = points.back().rgba & 0x000000FF;
+    points.back().rgba = (color.rgba & 0xFFFFFF00) | alpha;
 }
 
 void Turtle::color(Color color) {
@@ -91,13 +93,15 @@ void Turtle::circle(float radius, float extent, int steps) {
 }
 
 void Turtle::begin_fill() {
-    points.back().fill = true;
+    points.back().fill_rgba &= 0xFFFFFF00;
+    points.back().fill_rgba |= 0xFF;
 }
 
 void Turtle::end_fill() {
-    points.back().fill = false;
+    points.back().fill_rgba &= 0xFFFFFF00;
 }
 
 void Turtle::fillcolor(Color color) {
-    points.back().fill_rgba = color.rgba;
+    uint8_t alpha = points.back().fill_rgba & 0x000000FF;
+    points.back().fill_rgba = (color.rgba & 0xFFFFFF00) | alpha;
 }
