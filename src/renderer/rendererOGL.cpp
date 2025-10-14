@@ -81,7 +81,7 @@ void mainloop(int framerate) {
     float frameTimes[FRAMETIMES_SIZE] = {};
     #endif
 
-    constexpr uint VECTOR_SIZE = 10;
+    constexpr uint VECTOR_SIZE = 16;
 
     const uint num_turtles = Turtle::turtles().size();
 
@@ -118,8 +118,15 @@ void mainloop(int framerate) {
     glEnableVertexAttribArray(3);
     glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, VECTOR_SIZE * sizeof(float), (void*)(9*sizeof(float)));
     glEnableVertexAttribArray(4);
+    glVertexAttribPointer(5, 2, GL_FLOAT, GL_FALSE, VECTOR_SIZE * sizeof(float), (void*)(10 * sizeof(float)));
+    glEnableVertexAttribArray(5);
+    glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, VECTOR_SIZE * sizeof(float), (void*)(12 * sizeof(float)));
+    glEnableVertexAttribArray(6);
 
     glBindVertexArray(0);
+
+    float fill_start_pos[2 * num_turtles];
+    memset(fill_start_pos, 0.0f, 2 * num_turtles * sizeof(float));
 
     using clock = std::chrono::high_resolution_clock;
     const std::chrono::microseconds frameDuration(1000000 / framerate);
@@ -130,24 +137,43 @@ void mainloop(int framerate) {
             for (uint p = step[t]; p + 1 < turtle.get_points().size(); ++p) {
                 const std::vector<Point> points = turtle.get_points();
 
+                if (!(points[p].fill_rgba & 0xFF) && (points[p+1].fill_rgba & 0x000000FF)) {
+                    fill_start_pos[t*2] = points[p+1].x;
+                    fill_start_pos[t*2+1] = points[p+1].y;
+                }
+
+                lines[num_lines*VECTOR_SIZE    ] = points[p].x;
+                lines[num_lines*VECTOR_SIZE + 1] = points[p].y;
+
+                lines[num_lines*VECTOR_SIZE + 2] = points[p+1].x;
+                lines[num_lines*VECTOR_SIZE + 3] = points[p+1].y;
+
                 uint32_t rgba = points[p].rgba;
                 float r = ((rgba >> 24) & 0xFF)/255.0f;
                 float g = ((rgba >> 16) & 0xFF)/255.0f;
                 float b = ((rgba >> 8) & 0xFF)/255.0f;
                 float a = (rgba & 0xFF)/255.0f;
-
-                lines[num_lines*VECTOR_SIZE    ] = points[p].x / (screen_x / 2.0f);
-                lines[num_lines*VECTOR_SIZE + 1] = points[p].y / (screen_y / 2.0f);
-                lines[num_lines*VECTOR_SIZE + 2] = points[p+1].x / (screen_x / 2.0f);
-                lines[num_lines*VECTOR_SIZE + 3] = points[p+1].y / (screen_y / 2.0f);
                 lines[num_lines*VECTOR_SIZE + 4] = r;
                 lines[num_lines*VECTOR_SIZE + 5] = g;
                 lines[num_lines*VECTOR_SIZE + 6] = b;
                 lines[num_lines*VECTOR_SIZE + 7] = a;
+
                 lines[num_lines*VECTOR_SIZE + 8] = points[p].thickness;
+
                 lines[num_lines*VECTOR_SIZE + 9] = depth;
 
-                //TODO fill & depth
+                lines[num_lines*VECTOR_SIZE + 10] = fill_start_pos[t*2];
+                lines[num_lines*VECTOR_SIZE + 11] = fill_start_pos[t*2+1];
+
+                uint32_t fill_rgba = points[p].fill_rgba;
+                float fill_r = ((fill_rgba >> 24) & 0xFF)/255.0f;
+                float fill_g = ((fill_rgba >> 16) & 0xFF)/255.0f;
+                float fill_b = ((fill_rgba >> 8) & 0xFF)/255.0f;
+                float fill_a = (fill_rgba & 0xFF)/255.0f;
+                lines[num_lines*VECTOR_SIZE + 12] = fill_r;
+                lines[num_lines*VECTOR_SIZE + 13] = fill_g;
+                lines[num_lines*VECTOR_SIZE + 14] = fill_b;
+                lines[num_lines*VECTOR_SIZE + 15] = fill_a;
 
                 num_lines++;
                 step[t]++;
