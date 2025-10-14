@@ -81,7 +81,7 @@ void mainloop(int framerate) {
     float frameTimes[FRAMETIMES_SIZE] = {};
     #endif
 
-    constexpr uint VECTOR_SIZE = 16;
+    constexpr uint VECTOR_SIZE = 11;
 
     const uint num_turtles = Turtle::turtles().size();
 
@@ -112,21 +112,21 @@ void mainloop(int framerate) {
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, VECTOR_SIZE * sizeof(float), (void*)(2 * sizeof(float)));
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, VECTOR_SIZE * sizeof(float), (void*)(4 * sizeof(float)));
+    glVertexAttribIPointer(2, 1, GL_UNSIGNED_INT, VECTOR_SIZE * sizeof(float), (void*)(4 * sizeof(float)));
     glEnableVertexAttribArray(2);
-    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, VECTOR_SIZE * sizeof(float), (void*)(8*sizeof(float)));
+    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, VECTOR_SIZE * sizeof(float), (void*)(5*sizeof(float)));
     glEnableVertexAttribArray(3);
-    glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, VECTOR_SIZE * sizeof(float), (void*)(9*sizeof(float)));
+    glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, VECTOR_SIZE * sizeof(float), (void*)(6*sizeof(float)));
     glEnableVertexAttribArray(4);
-    glVertexAttribPointer(5, 2, GL_FLOAT, GL_FALSE, VECTOR_SIZE * sizeof(float), (void*)(10 * sizeof(float)));
+    glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, VECTOR_SIZE * sizeof(float), (void*)(7 * sizeof(float)));
     glEnableVertexAttribArray(5);
-    glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, VECTOR_SIZE * sizeof(float), (void*)(12 * sizeof(float)));
+    glVertexAttribIPointer(6, 1, GL_UNSIGNED_INT, VECTOR_SIZE * sizeof(float), (void*)(10 * sizeof(float)));
     glEnableVertexAttribArray(6);
 
     glBindVertexArray(0);
 
-    float fill_start_pos[2 * num_turtles];
-    memset(fill_start_pos, 0.0f, 2 * num_turtles * sizeof(float));
+    float fill_start_pos[3 * num_turtles];
+    memset(fill_start_pos, 0.0f, 3 * num_turtles * sizeof(float));
 
     using clock = std::chrono::high_resolution_clock;
     const std::chrono::microseconds frameDuration(1000000 / framerate);
@@ -136,10 +136,10 @@ void mainloop(int framerate) {
             Turtle turtle = *Turtle::turtles()[t];
             for (uint p = step[t]; p + 1 < turtle.get_points().size(); ++p) {
                 const std::vector<Point> points = turtle.get_points();
-
                 if (!(points[p].fill_rgba & 0xFF) && (points[p+1].fill_rgba & 0x000000FF)) {
                     fill_start_pos[t*2] = points[p+1].x;
                     fill_start_pos[t*2+1] = points[p+1].y;
+                    fill_start_pos[t*3+2] = depth; //TODO is depth correctly intitaliazed for id=0 fill?
                 }
 
                 lines[num_lines*VECTOR_SIZE    ] = points[p].x;
@@ -148,32 +148,17 @@ void mainloop(int framerate) {
                 lines[num_lines*VECTOR_SIZE + 2] = points[p+1].x;
                 lines[num_lines*VECTOR_SIZE + 3] = points[p+1].y;
 
-                uint32_t rgba = points[p].rgba;
-                float r = ((rgba >> 24) & 0xFF)/255.0f;
-                float g = ((rgba >> 16) & 0xFF)/255.0f;
-                float b = ((rgba >> 8) & 0xFF)/255.0f;
-                float a = (rgba & 0xFF)/255.0f;
-                lines[num_lines*VECTOR_SIZE + 4] = r;
-                lines[num_lines*VECTOR_SIZE + 5] = g;
-                lines[num_lines*VECTOR_SIZE + 6] = b;
-                lines[num_lines*VECTOR_SIZE + 7] = a;
+                memcpy(lines + num_lines*VECTOR_SIZE + 4, &points[p].rgba, sizeof(float));
 
-                lines[num_lines*VECTOR_SIZE + 8] = points[p].thickness;
+                lines[num_lines*VECTOR_SIZE + 5] = points[p].thickness;
 
-                lines[num_lines*VECTOR_SIZE + 9] = depth;
+                lines[num_lines*VECTOR_SIZE + 6] = depth; // TODO
 
-                lines[num_lines*VECTOR_SIZE + 10] = fill_start_pos[t*2];
-                lines[num_lines*VECTOR_SIZE + 11] = fill_start_pos[t*2+1];
+                lines[num_lines*VECTOR_SIZE + 7] = fill_start_pos[t*3];
+                lines[num_lines*VECTOR_SIZE + 8] = fill_start_pos[t*3+1];
+                lines[num_lines*VECTOR_SIZE + 9] = fill_start_pos[t*3+2];
 
-                uint32_t fill_rgba = points[p].fill_rgba;
-                float fill_r = ((fill_rgba >> 24) & 0xFF)/255.0f;
-                float fill_g = ((fill_rgba >> 16) & 0xFF)/255.0f;
-                float fill_b = ((fill_rgba >> 8) & 0xFF)/255.0f;
-                float fill_a = (fill_rgba & 0xFF)/255.0f;
-                lines[num_lines*VECTOR_SIZE + 12] = fill_r;
-                lines[num_lines*VECTOR_SIZE + 13] = fill_g;
-                lines[num_lines*VECTOR_SIZE + 14] = fill_b;
-                lines[num_lines*VECTOR_SIZE + 15] = fill_a;
+                memcpy(lines + num_lines*VECTOR_SIZE + 10, &points[p].fill_rgba, sizeof(float));
 
                 num_lines++;
                 step[t]++;

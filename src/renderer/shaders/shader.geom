@@ -8,7 +8,7 @@ in vec2 vPos1[];
 in vec4 vertexColor[];
 in vec2 vertexThickness[];
 in float vertexDepth[];
-in vec2 vFillPos[]; 
+in vec3 vFillPos[]; 
 in vec4 vertexFillColor[];
 
 out vec4 fragColor;
@@ -33,9 +33,9 @@ void main() {
 
     if (vertexFillColor[0].w > 0.0) {
         fragColor = vertexFillColor[0];
-        gl_Position = vec4(p0, vertexDepth[0], 1.0); EmitVertex();
-        gl_Position = vec4(p1, vertexDepth[0], 1.0); EmitVertex();
-        gl_Position = vec4(vFillPos[0], vertexDepth[0], 1.0); EmitVertex();
+        gl_Position = vec4(p0, vFillPos[0].z, 1.0); EmitVertex();
+        gl_Position = vec4(p1, vFillPos[0].z, 1.0); EmitVertex();
+        gl_Position = vec4(vFillPos[0], 1.0); EmitVertex();
         EndPrimitive();
     }
 }
