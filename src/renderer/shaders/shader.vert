@@ -18,6 +18,7 @@ out vec4 vertexFillColor;
 
 uniform float screen_x;
 uniform float screen_y;
+uniform float w;
 
 void main() {
     vec2 scale = vec2(2 / screen_x, 2 / screen_y);
@@ -31,8 +32,8 @@ void main() {
         float(aColor & 0xFF)
     ) / 255.0;
     vertexThickness = aThickness * scale;
-    vertexDepth = aDepth;
-    vFillPos = aFillPos * vec3(scale, 1.0);
+    vertexDepth = aDepth / w;
+    vFillPos = aFillPos * vec3(scale, 1.0 / w);
     vertexFillColor = vertexFillColor = vec4(
         float((aFillColor >> 24) & 0xFF),
         float((aFillColor >> 16) & 0xFF),
@@ -40,5 +41,5 @@ void main() {
         float(aFillColor & 0xFF)
     ) / 255.0;
 
-    gl_Position = vec4(aPos0 * scale, aDepth, 1.0);
+    gl_Position = vec4(aPos0 * scale, aDepth / w, 1.0);
 }

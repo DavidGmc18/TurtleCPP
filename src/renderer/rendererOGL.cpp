@@ -64,6 +64,7 @@ void mainloop(int framerate) {
     GLuint shaderProgram = createShaderProgram(shader_vert_src, shader_geom_src, shader_frag_src);
     GLuint locX = glGetUniformLocation(shaderProgram, "screen_x");
     GLuint locY = glGetUniformLocation(shaderProgram, "screen_y");
+    GLuint w_uniform = glGetUniformLocation(shaderProgram, "w");
     glUseProgram(shaderProgram);
     glUniform1f(locX, float(screen_x));
     glUniform1f(locY, float(screen_y));
@@ -96,8 +97,6 @@ void mainloop(int framerate) {
     float lines[total_num_lines * VECTOR_SIZE];
     uint num_lines = 0;
 
-    float depth = 0.0f;
-
     uint current_line_indicies[num_turtles];
 
     GLuint vao, vbo;
@@ -128,6 +127,11 @@ void mainloop(int framerate) {
     float fill_start_pos[3 * num_turtles];
     memset(fill_start_pos, 0.0f, 3 * num_turtles * sizeof(float));
 
+    float distance[num_turtles];
+    memset(distance, 0.0f, num_turtles * sizeof(float));
+
+    float w = 1.0f;
+
     using clock = std::chrono::high_resolution_clock;
     const std::chrono::microseconds frameDuration(1000000 / framerate);
     auto frameStart = clock::now();
@@ -139,7 +143,7 @@ void mainloop(int framerate) {
                 if (!(points[p].fill_rgba & 0xFF) && (points[p+1].fill_rgba & 0x000000FF)) {
                     fill_start_pos[t*2] = points[p+1].x;
                     fill_start_pos[t*2+1] = points[p+1].y;
-                    fill_start_pos[t*3+2] = depth; //TODO is depth correctly intitaliazed for id=0 fill?
+                    fill_start_pos[t*3+2] = -distance[t] / turtle.speed;
                 }
 
                 lines[num_lines*VECTOR_SIZE    ] = points[p].x;
@@ -152,7 +156,7 @@ void mainloop(int framerate) {
 
                 lines[num_lines*VECTOR_SIZE + 5] = points[p].thickness;
 
-                lines[num_lines*VECTOR_SIZE + 6] = depth; // TODO
+                lines[num_lines*VECTOR_SIZE + 6] = -distance[t] / turtle.speed; // TODO
 
                 lines[num_lines*VECTOR_SIZE + 7] = fill_start_pos[t*3];
                 lines[num_lines*VECTOR_SIZE + 8] = fill_start_pos[t*3+1];
@@ -162,8 +166,17 @@ void mainloop(int framerate) {
 
                 num_lines++;
                 step[t]++;
+
+                float dx = points[p+1].x - points[p].x;
+                float dy = points[p+1].y - points[p].y;
+                float d = pow(pow(dx, 2) + pow(dy, 2), 0.5);
+                distance[t] += d;
+            }
+            if (distance[t] / turtle.speed > w) {
+                w = distance[t] / turtle.speed;
             }
         }
+        glUniform1f(w_uniform, w);
 
         glClearColor(screen_r, screen_g, screen_b, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
