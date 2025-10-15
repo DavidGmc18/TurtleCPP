@@ -130,47 +130,79 @@ void mainloop(int framerate) {
     float distance[num_turtles];
     memset(distance, 0.0f, num_turtles * sizeof(float));
 
-    float w = 1.0f;
+    uint current_line[num_turtles];
+
+    bool cpyData[num_turtles];
+    memset(cpyData, true, num_turtles * sizeof(bool));
+
+    float w = 1.0f; 
 
     using clock = std::chrono::high_resolution_clock;
     const std::chrono::microseconds frameDuration(1000000 / framerate);
     auto frameStart = clock::now();
+    auto startTime = clock::now();
+
     while (!glfwWindowShouldClose(window)) {
+        auto current_time = clock::now();
         for (int t = 0; t < num_turtles; ++t) {
             Turtle turtle = *Turtle::turtles()[t];
             for (uint p = step[t]; p + 1 < turtle.get_points().size(); ++p) {
                 const std::vector<Point> points = turtle.get_points();
-                if (!(points[p].fill_rgba & 0xFF) && (points[p+1].fill_rgba & 0x000000FF)) {
-                    fill_start_pos[t*2] = points[p+1].x;
-                    fill_start_pos[t*2+1] = points[p+1].y;
-                    fill_start_pos[t*3+2] = -distance[t] / turtle.speed;
+                uint line_id = current_line[t];
+
+                if (cpyData[t]) {
+                    cpyData[t] = false;
+                    current_line[t] = num_lines;
+                    num_lines++;
+                    line_id = current_line[t];
+
+                    if (!(points[p].fill_rgba & 0xFF) && (points[p+1].fill_rgba & 0x000000FF)) {
+                        fill_start_pos[t*2] = points[p+1].x;
+                        fill_start_pos[t*2+1] = points[p+1].y;
+                        // TODO make sure turtle with speed of 0 is in fornt of all other turtles, current statment does not do that
+                        fill_start_pos[t*3+2] = (turtle.speed != 0) ? (-distance[t] / turtle.speed) : (-distance[t]);
+                    }
+
+                    lines[line_id*VECTOR_SIZE    ] = points[p].x;
+                    lines[line_id*VECTOR_SIZE + 1] = points[p].y;
+
+                    memcpy(lines + line_id*VECTOR_SIZE + 4, &points[p].rgba, sizeof(float));
+
+                    lines[line_id*VECTOR_SIZE + 5] = points[p].thickness;
+                    
+                    // HERE too regarding zero speed
+                    lines[line_id*VECTOR_SIZE + 6] = (turtle.speed != 0) ? (-distance[t] / turtle.speed) : (-distance[t]);
+
+                    lines[line_id*VECTOR_SIZE + 7] = fill_start_pos[t*3];
+                    lines[line_id*VECTOR_SIZE + 8] = fill_start_pos[t*3+1];
+                    lines[line_id*VECTOR_SIZE + 9] = fill_start_pos[t*3+2];
+
+                    memcpy(lines + line_id*VECTOR_SIZE + 10, &points[p].fill_rgba, sizeof(float));
+
                 }
-
-                lines[num_lines*VECTOR_SIZE    ] = points[p].x;
-                lines[num_lines*VECTOR_SIZE + 1] = points[p].y;
-
-                lines[num_lines*VECTOR_SIZE + 2] = points[p+1].x;
-                lines[num_lines*VECTOR_SIZE + 3] = points[p+1].y;
-
-                memcpy(lines + num_lines*VECTOR_SIZE + 4, &points[p].rgba, sizeof(float));
-
-                lines[num_lines*VECTOR_SIZE + 5] = points[p].thickness;
-
-                lines[num_lines*VECTOR_SIZE + 6] = -distance[t] / turtle.speed; // TODO
-
-                lines[num_lines*VECTOR_SIZE + 7] = fill_start_pos[t*3];
-                lines[num_lines*VECTOR_SIZE + 8] = fill_start_pos[t*3+1];
-                lines[num_lines*VECTOR_SIZE + 9] = fill_start_pos[t*3+2];
-
-                memcpy(lines + num_lines*VECTOR_SIZE + 10, &points[p].fill_rgba, sizeof(float));
-
-                num_lines++;
-                step[t]++;
 
                 float dx = points[p+1].x - points[p].x;
                 float dy = points[p+1].y - points[p].y;
                 float d = pow(pow(dx, 2) + pow(dy, 2), 0.5);
-                distance[t] += d;
+                float ratio;
+                if (turtle.speed) {
+                    float expected_distance = std::chrono::duration<float>(current_time - startTime).count() * turtle.speed;
+                    float missing_distance = expected_distance - distance[t];
+                    ratio = missing_distance / d;
+                } else {
+                    ratio = 1.0f;
+                }
+
+                lines[line_id*VECTOR_SIZE + 2] = points[p].x + ratio * dx;
+                lines[line_id*VECTOR_SIZE + 3] = points[p].y + ratio * dy;
+
+                if (ratio >= 1.0f) {
+                    step[t]++;
+                    cpyData[t] = true;
+                    distance[t] += d;
+                } else {
+                    break;
+                }
             }
             if (distance[t] / turtle.speed > w) {
                 w = distance[t] / turtle.speed;
@@ -207,6 +239,11 @@ void mainloop(int framerate) {
             float max = *std::max_element(frameTimes, frameTimes + FRAMETIMES_SIZE);
             float min = *std::min_element(frameTimes, frameTimes + FRAMETIMES_SIZE);
             printf("Frame time(%i) ->  MIN %.3fms  AVG %.3fms  MAX %.3fms\n", FRAMETIMES_SIZE, min, avg, max);
+        }
+        GLenum err = glGetError();
+        while (err != GL_NO_ERROR) {
+            std::cerr << "OpenGL error: " << err << "\n";
+            err = glGetError();
         }
         #endif
     }
