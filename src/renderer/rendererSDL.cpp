@@ -79,11 +79,7 @@ void mainloop(int framerate) {
     SDL_Event e;
 
     std::vector<uint> step(Turtle::turtles().size(), 0);
-    std::vector<Uint32> start(Turtle::turtles().size(), 0);
-    for (int idx = 0; idx < Turtle::turtles().size(); ++idx) {
-        start[idx] = SDL_GetTicks();
-    }
-
+    Uint32 start = SDL_GetTicks();
     std::vector<float> distance(Turtle::turtles().size(), 0);
 
     #ifdef DEBUG
@@ -118,7 +114,7 @@ void mainloop(int framerate) {
                     float dy = -(t->get_points()[i+1].y) + (t->get_points()[i].y);
                     float d = sqrtf(pow(dx, 2) + pow(dy, 2));
 
-                    float wd = t->speed * (SDL_GetTicks() - start[idx]) / 1000.0f;
+                    float wd = t->speed * (SDL_GetTicks() - start) / 1000.0f;
                     float r = (wd - distance[idx]) / d;
 
                     if (r >= 1) {
@@ -148,7 +144,7 @@ void mainloop(int framerate) {
                             float dy = -(t->get_points()[j + 1].y) + (t->get_points()[j].y);
                             float d = sqrtf(pow(dx, 2) + pow(dy, 2));
 
-                            float wd = t->speed * (SDL_GetTicks() - start[idx]) / 1000.0f;
+                            float wd = t->speed * (SDL_GetTicks() - start) / 1000.0f;
                             float r = std::min(std::max((wd - distance[idx]) / d, 0.0f), 1.0f);
                             
                             x4 = dx * r + x3;
