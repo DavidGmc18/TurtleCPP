@@ -188,7 +188,7 @@ void mainloop(int framerate) {
                 if (turtle.speed) {
                     float expected_distance = std::chrono::duration<float>(current_time - startTime).count() * turtle.speed;
                     float missing_distance = expected_distance - distance[t];
-                    ratio = missing_distance / d;
+                    ratio = std::max(missing_distance / d, 0.0f);
                 } else {
                     ratio = 1.0f;
                 }
