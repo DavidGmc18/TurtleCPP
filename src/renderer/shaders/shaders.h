@@ -2,7 +2,7 @@
 #ifdef BACKEND_GL
 
 #include "../glad/glad.h"
-#include <iostream>
+#include <stdio.h>
 
 extern const char* shader_vert_src;
 extern const char* shader_geom_src;
@@ -18,7 +18,7 @@ inline GLuint compileShader(GLenum type, const char* src) {
     if (!success) {
         char infoLog[512];
         glGetShaderInfoLog(shader, 512, nullptr, infoLog);
-        std::cerr << "Shader compilation failed:\n" << infoLog << "\n";
+        fprintf(stderr, "Shader compilation failed:\n%s\n", infoLog);
     }
     return shader;
 }
@@ -39,7 +39,7 @@ inline GLuint createShaderProgram(const char* vertexSrc, const char* geometrySrc
     if (!success) {
         char infoLog[512];
         glGetProgramInfoLog(program, 512, nullptr, infoLog);
-        std::cerr << "Program linking failed:\n" << infoLog << "\n";
+        fprintf(stderr, "Program linking failed:\n%s\n", infoLog);
     }
 
     glDeleteShader(vertexShader);

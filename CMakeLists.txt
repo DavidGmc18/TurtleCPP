@@ -24,19 +24,22 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif()
 
 # OpenGL
+set(SHADER_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/renderer/shaders")
+set(GENERATED_C "${CMAKE_CURRENT_BINARY_DIR}/shaders_gen.c")
 add_custom_command(
-    OUTPUT ${CMAKE_BINARY_DIR}/shaders_gen.o
-           ${CMAKE_BINARY_DIR}/shaders_gen.h
-    COMMAND ${CMAKE_SOURCE_DIR}/gen_shaders.sh
-            "src/renderer/shaders"
-            "src/renderer/shaders/shaders.h"
-            "build/shaders_gen.o"
-    DEPENDS ${CMAKE_SOURCE_DIR}/gen_shaders.sh
+    OUTPUT "${GENERATED_C}"
+    COMMAND ${CMAKE_COMMAND}
+        -DINPUT_DIR=${SHADER_DIR}
+        -DOUTPUT_C=${GENERATED_C}
+        -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/gen_shaders.cmake
+    DEPENDS ${SHADER_FILES} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/gen_shaders.cmake
+    COMMENT "Generating shaders_gen.c"
 )
+add_library(turtle_gl SHARED ${SRC_FILES} "${GENERATED_C}")
 
-add_library(turtle_gl SHARED ${SRC_FILES} ${CMAKE_BINARY_DIR}/shaders_gen.o)
 target_compile_definitions(turtle_gl PRIVATE BACKEND_GL)
 target_compile_options(turtle_gl PRIVATE -fPIC)
+
 set(GLFW_STATIC_LIB $ENV{HOME}/glfw-static/lib/libglfw3.a)
 if(APPLE)
     target_link_libraries(turtle_gl PRIVATE ${GLFW_STATIC_LIB} "-framework Cocoa" "-framework IOKit" "-framework CoreVideo" "-framework CoreFoundation" m pthread dl)
