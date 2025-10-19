@@ -30,7 +30,7 @@ void bgcolor(Color color) {
     screen_b = float((color.rgba >> 8) & 0xFF) / 255.0f;
 }
 
-void create_window(GLFWwindow** window) {
+void create_window(GLFWwindow** window, uint multisample) {
     if (!glfwInit()) {
         std::cerr << "Failed to initialize GLFW\n";
         return;
@@ -39,6 +39,7 @@ void create_window(GLFWwindow** window) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_SAMPLES, multisample);
    
     #ifdef __APPLE__
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
@@ -125,9 +126,9 @@ inline bool turtle_step(bool* cpyData, const uint t, uint* current_line, uint& n
     }
 }
 
-void mainloop(int framerate) {
+void mainloop(int framerate, uint multisample) {
     GLFWwindow* window = nullptr;
-    create_window(&window);
+    create_window(&window, multisample);
 
     #ifdef DEBUG
         std::cout << "OpenGL version: " << glGetString(GL_VERSION) << "\n";
@@ -149,6 +150,7 @@ void mainloop(int framerate) {
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
+    glEnable(GL_MULTISAMPLE);
 
     const uint num_turtles = Turtle::turtles().size();
 

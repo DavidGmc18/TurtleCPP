@@ -49,7 +49,11 @@ void draw_turtle(SDL_Renderer* renderer, float x, float y, float angle, Uint32 r
     filledTrigonRGBA(renderer, x1, y1, x4, y4, x3, y3, rgba >> 24, rgba >> 16, rgba >> 8, rgba);
 }
 
-void mainloop(int framerate) {
+void mainloop(int framerate, uint multisample) {
+    if (multisample) {
+        printf("Multisampling is not supported with SDL backend\n");
+    }
+
     SDL_Window *window;
     SDL_Renderer *renderer;
 
