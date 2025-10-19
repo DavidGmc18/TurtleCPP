@@ -1,6 +1,5 @@
 #pragma once
 
-#include "renderer.hpp"
 #include "color.hpp"
 #include <cmath>
 #include <cstdint>
@@ -56,3 +55,8 @@ public:
     void end_fill();
     void fillcolor(Color color);
 };
+
+void screen_size(int x, int y);
+void bgcolor(Color color);
+
+void mainloop(int framerate = 60);

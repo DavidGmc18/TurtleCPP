@@ -1,5 +1,4 @@
 #ifdef BACKEND_SDL
-#include "renderer.hpp"
 #include "turtle.hpp"
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_stdinc.h>
@@ -9,8 +8,8 @@
 #include <cstring>
 
 #ifdef DEBUG
-#include <algorithm>
-#include <numeric>
+    #include <algorithm>
+    #include <numeric>
 #endif
 
 static int screen_x = 800;
@@ -83,9 +82,9 @@ void mainloop(int framerate) {
     std::vector<float> distance(Turtle::turtles().size(), 0);
 
     #ifdef DEBUG
-    constexpr int frameTimesSize = 100;
-    int frame = 0;
-    float frameTimes[frameTimesSize] = {};
+        constexpr int frameTimesSize = 100;
+        int frame = 0;
+        float frameTimes[frameTimesSize] = {};
     #endif
 
     const float frameDelay = 1000.0f / framerate;
@@ -189,15 +188,15 @@ void mainloop(int framerate) {
         frameStart = SDL_GetPerformanceCounter();
 
         #ifdef DEBUG
-        frameTimes[frame] = frameTime;
-        frame++;
-        if (frame >= frameTimesSize) {
-            frame = 0;
-            float avg = std::accumulate(frameTimes, frameTimes + frameTimesSize, 0.0f) / frameTimesSize;
-            float max = *std::max_element(frameTimes, frameTimes + frameTimesSize);
-            float min = *std::min_element(frameTimes, frameTimes + frameTimesSize);
-            printf("Frame time(%i) ->  MIN %.3fms  AVG %.3fms  MAX %.3fms\n", frameTimesSize, min, avg, max);
-        }
+            frameTimes[frame] = frameTime;
+            frame++;
+            if (frame >= frameTimesSize) {
+                frame = 0;
+                float avg = std::accumulate(frameTimes, frameTimes + frameTimesSize, 0.0f) / frameTimesSize;
+                float max = *std::max_element(frameTimes, frameTimes + frameTimesSize);
+                float min = *std::min_element(frameTimes, frameTimes + frameTimesSize);
+                printf("Frame time(%i) ->  MIN %.3fms  AVG %.3fms  MAX %.3fms\n", frameTimesSize, min, avg, max);
+            }
         #endif
     }
 }
