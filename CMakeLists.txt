@@ -4,7 +4,7 @@ project(Turtle LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
+    set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type" FORCE)
 endif()
 
 find_package(PkgConfig REQUIRED)
@@ -15,7 +15,7 @@ file(GLOB_RECURSE SRC_FILES ${CMAKE_SOURCE_DIR}/src/*.cpp ${CMAKE_SOURCE_DIR}/sr
 
 # SDL
 add_library(turtle_sdl SHARED ${SRC_FILES})
-target_compile_definitions(turtle_sdl PRIVATE BACKEND_SDL)
+target_compile_definitions(turtle_sdl PRIVATE BACKEND_SDL $<$<CONFIG:Debug>:DEBUG>)
 target_compile_options(turtle_sdl PRIVATE -fPIC)
 target_include_directories(turtle_sdl PRIVATE ${SDL2_INCLUDE_DIRS})
 target_link_libraries(turtle_sdl PRIVATE ${SDL2_LIBRARIES} SDL2_gfx m dl pthread)
@@ -37,7 +37,7 @@ add_custom_command(
 )
 add_library(turtle_gl SHARED ${SRC_FILES} "${GENERATED_C}")
 
-target_compile_definitions(turtle_gl PRIVATE BACKEND_GL)
+target_compile_definitions(turtle_gl PRIVATE BACKEND_GL $<$<CONFIG:Debug>:DEBUG>)
 target_compile_options(turtle_gl PRIVATE -fPIC)
 
 set(GLFW_STATIC_LIB $ENV{HOME}/glfw-static/lib/libglfw3.a)
@@ -47,8 +47,4 @@ elseif(WIN32)
     target_link_libraries(turtle_gl PRIVATE ${GLFW_STATIC_LIB} opengl32 gdi32 user32 kernel32)
 else() # assume Linux
     target_link_libraries(turtle_gl PRIVATE ${GLFW_STATIC_LIB} X11 pthread dl m)
-endif()
-
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    target_compile_definitions(turtle_gl PRIVATE DEBUG)
 endif()
