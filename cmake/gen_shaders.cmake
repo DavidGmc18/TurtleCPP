@@ -1,6 +1,6 @@
-file(WRITE "${OUTPUT_C}")
-file(GLOB SHADER_FILES "${INPUT_DIR}/*")
+file(WRITE "${OUTPUT_C}" "#include \"../src/renderer/shaders/shaders.h\"\n")
 
+file(GLOB SHADER_FILES "${INPUT_DIR}/*")
 foreach(SHADER_FILE IN LISTS SHADER_FILES)
     get_filename_component(FILE_EXT "${SHADER_FILE}" EXT)
     if(NOT EXISTS "${SHADER_FILE}" OR IS_DIRECTORY "${SHADER_FILE}" OR FILE_EXT STREQUAL ".h")
