@@ -1,7 +1,6 @@
 #pragma once
 
 #include "color.hpp"
-#include <cmath>
 #include <cstdint>
 #include <sys/types.h>
 #include <vector>
@@ -22,13 +21,13 @@ protected:
     std::vector<Point> points = {Point{}};
 
 public:
-    uint speed = 100;
+    float speed = 100;
     uint32_t rgba = 0x000000FF;
 
     Turtle();
 
     static const std::vector<Turtle*>& turtles();
-    std::vector<Point> get_points();
+    const std::vector<Point>& get_points() const;
 
     void forward(float d);
     void backward(float d);
@@ -43,7 +42,7 @@ public:
 
     void color(Color color);
 
-    void set_speed(int v);
+    void set_speed(float v);
 
     void go_to(float x, float y);
 

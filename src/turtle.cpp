@@ -1,5 +1,6 @@
 #include "turtle.hpp"
 #include "color.hpp"
+#include <cmath>
 
 std::vector<Turtle*> Turtle::all_turtles = {};
 
@@ -11,7 +12,7 @@ const std::vector<Turtle*>& Turtle::turtles() {
     return all_turtles;
 }
 
-std::vector<Point> Turtle::get_points() {
+const std::vector<Point>& Turtle::get_points() const {
     return points;
 }
 
@@ -57,7 +58,7 @@ void Turtle::color(Color color) {
     rgba = color.rgba;
 }
 
-void Turtle::set_speed(int v) {
+void Turtle::set_speed(float v) {
     speed = v;
 }
 

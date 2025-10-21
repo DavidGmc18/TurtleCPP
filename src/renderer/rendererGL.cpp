@@ -7,6 +7,8 @@
 #include <thread>
 #include "glad/glad.h"
 #include <GLFW/glfw3.h>
+#include <cmath>
+#include <cstdint>
 
 #ifdef DEBUG
     #include <algorithm>
@@ -30,7 +32,7 @@ void bgcolor(Color color) {
     screen_b = float((color.rgba >> 8) & 0xFF) / 255.0f;
 }
 
-void create_window(GLFWwindow** window, uint multisample) {
+void create_window(GLFWwindow** window, uint32_t multisample) {
     if (!glfwInit()) {
         std::cerr << "Failed to initialize GLFW\n";
         return;
@@ -62,14 +64,23 @@ void create_window(GLFWwindow** window, uint multisample) {
     }
 }
 
-constexpr uint VECTOR_SIZE = 11;
+constexpr uint32_t VECTOR_SIZE = 11;
 
-inline bool turtle_step(bool* cpyData, const uint t, uint* current_line, uint& num_lines, uint& line_id, const std::vector<Point>& points, const uint p, float* fill_start_pos,
-    const Turtle& turtle, float* distance, float* lines,
+static uint64_t num_lines;
+static uint64_t* step;
+static float* lines;
+static float* fill_start_pos;
+static float* distance;
+static uint64_t* current_line;
+static bool* cpyData;
+
+inline bool turtle_step(const Turtle& turtle, const uint64_t t, const uint64_t p,
     const std::chrono::high_resolution_clock::time_point& current_time,
-    const std::chrono::high_resolution_clock::time_point& startTime,
-    uint* step
+    const std::chrono::high_resolution_clock::time_point& startTime
 ) {
+    const std::vector<Point>& points = turtle.get_points();
+    uint64_t line_id = current_line[t];
+
     if (cpyData[t]) {
         cpyData[t] = false;
         current_line[t] = num_lines;
@@ -126,7 +137,7 @@ inline bool turtle_step(bool* cpyData, const uint t, uint* current_line, uint& n
     }
 }
 
-void mainloop(int framerate, uint multisample) {
+void mainloop(int framerate, uint32_t multisample) {
     GLFWwindow* window = nullptr;
     create_window(&window, multisample);
 
@@ -152,20 +163,22 @@ void mainloop(int framerate, uint multisample) {
     glDepthFunc(GL_LESS);
     glEnable(GL_MULTISAMPLE);
 
-    const uint num_turtles = Turtle::turtles().size();
-
-    uint step[num_turtles];
-    memset(step, 0, num_turtles * sizeof(uint));
-
-    uint n = 0;
+    const uint64_t num_turtles = Turtle::turtles().size();
+    uint64_t n = 0;
     for (int t = 0; t < num_turtles; ++t) {
         n += Turtle::turtles()[t]->get_points().size() - 1;
     }
-    const uint total_num_lines = n;
-    float lines[total_num_lines * VECTOR_SIZE];
-    uint num_lines = 0;
+    const uint64_t total_num_lines = n;
 
-    uint current_line_indicies[num_turtles];
+    num_lines = 0;
+    step = new uint64_t[num_turtles]();
+    lines = new float[total_num_lines * VECTOR_SIZE];
+    fill_start_pos = new float[3 * num_turtles]();
+    distance = new float[num_turtles]();
+    current_line = new uint64_t[num_turtles];
+    cpyData = new bool [num_turtles];
+
+    memset(cpyData, true, num_turtles * sizeof(bool));
 
     GLuint vao, vbo;
     glGenVertexArrays(1, &vao);
@@ -173,7 +186,7 @@ void mainloop(int framerate, uint multisample) {
 
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(lines), nullptr, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, total_num_lines * VECTOR_SIZE * sizeof(float), nullptr, GL_DYNAMIC_DRAW);
 
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, VECTOR_SIZE * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
@@ -192,17 +205,6 @@ void mainloop(int framerate, uint multisample) {
 
     glBindVertexArray(0);
 
-    float fill_start_pos[3 * num_turtles];
-    memset(fill_start_pos, 0.0f, 3 * num_turtles * sizeof(float));
-
-    float distance[num_turtles];
-    memset(distance, 0.0f, num_turtles * sizeof(float));
-
-    uint current_line[num_turtles];
-
-    bool cpyData[num_turtles];
-    memset(cpyData, true, num_turtles * sizeof(bool));
-
     float w = 1.0f; 
 
     using clock = std::chrono::high_resolution_clock;
@@ -214,11 +216,11 @@ void mainloop(int framerate, uint multisample) {
         auto current_time = clock::now();
         for (int t = 0; t < num_turtles; ++t) {
             Turtle turtle = *Turtle::turtles()[t];
-            for (uint p = step[t]; p + 1 < turtle.get_points().size(); ++p) {
+            for (uint64_t p = step[t]; p + 1 < turtle.get_points().size(); ++p) {
                 const std::vector<Point> points = turtle.get_points();
                 if (turtle_step(
-                    cpyData, t, current_line, num_lines, current_line[t], points, p, fill_start_pos,
-                    turtle, distance, lines, current_time, startTime, step
+                    turtle, t, p,
+                    current_time, startTime
                 )) {
                     break;
                 }
@@ -269,5 +271,12 @@ void mainloop(int framerate, uint multisample) {
 
     glfwDestroyWindow(window);
     glfwTerminate();
+
+    delete[] step;
+    delete[]lines;
+    delete[]fill_start_pos;
+    delete[]distance;
+    delete[]current_line;
+    delete[]cpyData;
 }
 #endif
