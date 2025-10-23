@@ -1,4 +1,4 @@
-file(WRITE "${OUTPUT_CPP}" "#include \"../src/renderer/shaders/shaders.hpp\"\n")
+file(WRITE "${OUTPUT_CPP}" "#include \"../src/shaders/shaders.hpp\"\n")
 
 file(GLOB SHADER_FILES "${INPUT_DIR}/*")
 foreach(SHADER_FILE IN LISTS SHADER_FILES)
