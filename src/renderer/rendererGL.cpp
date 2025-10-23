@@ -1,6 +1,6 @@
 #ifdef BACKEND_GL
 #include "turtle.hpp"
-#include "shaders/shaders.h"
+#include "shaders/shaders.hpp"
 #include <string.h>
 #include <chrono>
 #include <iostream>

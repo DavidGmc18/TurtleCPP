@@ -1,4 +1,4 @@
-file(WRITE "${OUTPUT_C}" "#include \"../src/renderer/shaders/shaders.h\"\n")
+file(WRITE "${OUTPUT_CPP}" "#include \"../src/renderer/shaders/shaders.hpp\"\n")
 
 file(GLOB SHADER_FILES "${INPUT_DIR}/*")
 foreach(SHADER_FILE IN LISTS SHADER_FILES)
@@ -16,5 +16,5 @@ foreach(SHADER_FILE IN LISTS SHADER_FILES)
     string(REPLACE "\"" "\\\"" ESCAPED_CONTENTS "${CONTENTS}")
     string(REPLACE "\n" "\\n\"\n\"" ESCAPED_CONTENTS "${ESCAPED_CONTENTS}")
 
-    file(APPEND "${OUTPUT_C}" "const char* shader_${EXT_NO_DOT}_src = \"${ESCAPED_CONTENTS}\";\n\n")
+    file(APPEND "${OUTPUT_CPP}" "const char* shader_${EXT_NO_DOT}_src = \"${ESCAPED_CONTENTS}\";\n\n")
 endforeach()
