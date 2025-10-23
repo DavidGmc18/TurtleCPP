@@ -1,4 +1,3 @@
-#ifdef BACKEND_GL
 #include "turtle.hpp"
 #include "shaders/shaders.hpp"
 #include <string.h>
@@ -279,4 +278,3 @@ void mainloop(int framerate, uint32_t multisample) {
     delete[]current_line;
     delete[]cpyData;
 }
-#endif

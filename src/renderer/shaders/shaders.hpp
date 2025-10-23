@@ -1,5 +1,4 @@
 #pragma once
-#ifdef BACKEND_GL
 
 #include "../glad/glad.h"
 #include <stdio.h>
@@ -47,5 +46,3 @@ inline GLuint createShaderProgram(const char* vertexSrc, const char* geometrySrc
     glDeleteShader(fragmentShader);
     return program;
 }
-
-#endif
