@@ -31,7 +31,7 @@ void bgcolor(Color color) {
     screen_b = float((color.rgba >> 8) & 0xFF) / 255.0f;
 }
 
-void create_window(GLFWwindow** window, uint32_t multisample) {
+void create_window(GLFWwindow** window, uint32_t& framerate, uint32_t multisample) {
     if (!glfwInit()) {
         std::cerr << "Failed to initialize GLFW\n";
         return;
@@ -60,6 +60,33 @@ void create_window(GLFWwindow** window, uint32_t multisample) {
         std::cerr << "Failed to initialize GLAD\n";
         glfwTerminate();
         return;
+    }
+
+    if (framerate == 0) {
+        GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+        if (!monitor) {
+            std::cerr << "No primary monitor found\n";
+            glfwTerminate();
+            return;
+        }
+
+        const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+        if (!mode) {
+            std::cerr << "Could not get video mode\n";
+            glfwTerminate();
+            return;
+        }
+
+        framerate = mode->refreshRate;
+
+        if (framerate == 0) {
+            framerate = 60;
+            printf("Automatic framerate detection failed, defaulting to %iHz\n", framerate);
+        } else {
+            #ifdef DEBUG
+            printf("Automatically detected framerate: %iHz\n", framerate);
+            #endif
+        }
     }
 }
 
@@ -136,9 +163,9 @@ inline bool turtle_step(const Turtle& turtle, const uint64_t t, const uint64_t p
     }
 }
 
-void mainloop(int framerate, uint32_t multisample) {
+void mainloop(uint32_t framerate, uint32_t multisample) {
     GLFWwindow* window = nullptr;
-    create_window(&window, multisample);
+    create_window(&window, framerate, multisample);
 
     #ifdef DEBUG
         std::cout << "OpenGL version: " << glGetString(GL_VERSION) << "\n";
