@@ -41,4 +41,24 @@ elseif (WIN32)
     find_package(glfw3 CONFIG REQUIRED)
     target_compile_definitions(turtle PRIVATE TURTLE_EXPORTS)
     target_link_libraries(turtle PRIVATE glfw)
+elseif(APPLE)
+    # Try to find GLFW via Homebrew or system installation
+    find_package(glfw3 CONFIG QUIET)
+    if(NOT glfw3_FOUND)
+        # Fallback: look for pkg-config if Homebrew didn't install a CMake config
+        find_package(PkgConfig REQUIRED)
+        pkg_check_modules(GLFW REQUIRED glfw3)
+        include_directories(${GLFW_INCLUDE_DIRS})
+        link_directories(${GLFW_LIBRARY_DIRS})
+        target_link_libraries(turtle PRIVATE ${GLFW_LIBRARIES})
+    else()
+        target_link_libraries(turtle PRIVATE glfw)
+    endif()
+
+    # Link macOS frameworks required by GLFW/OpenGL
+    target_link_libraries(turtle PRIVATE
+        "-framework Cocoa"
+        "-framework IOKit"
+        "-framework CoreVideo"
+    )
 endif()

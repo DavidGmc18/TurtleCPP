@@ -1,4 +1,4 @@
-#version 450 core
+#version 410 core
 
 layout(location = 0) in vec2 aPos0;
 layout(location = 1) in vec2 aPos1;
@@ -26,19 +26,19 @@ void main() {
     vPos0 = aPos0 * scale;
     vPos1 = aPos1 * scale;
     vertexColor = vec4(
-        float((aColor >> 24) & 0xFF),
-        float((aColor >> 16) & 0xFF),
-        float((aColor >> 8) & 0xFF),
-        float(aColor & 0xFF)
+        float((aColor >> 24) & uint(0xFF)),
+        float((aColor >> 16) & uint(0xFF)),
+        float((aColor >> 8) & uint(0xFF)),
+        float(aColor & uint(0xFF))
     ) / 255.0;
     vertexThickness = aThickness * scale;
     vertexDepth = aDepth / w;
     vFillPos = aFillPos * vec3(scale, 1.0 / w);
     vertexFillColor = vertexFillColor = vec4(
-        float((aFillColor >> 24) & 0xFF),
-        float((aFillColor >> 16) & 0xFF),
-        float((aFillColor >> 8) & 0xFF),
-        float(aFillColor & 0xFF)
+        float((aFillColor >> 24) & uint(0xFF)),
+        float((aFillColor >> 16) & uint(0xFF)),
+        float((aFillColor >> 8) & uint(0xFF)),
+        float(aFillColor & uint(0xFF))
     ) / 255.0;
 
     gl_Position = vec4(aPos0 * scale, aDepth / w, 1.0);
