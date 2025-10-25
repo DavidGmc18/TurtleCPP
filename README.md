@@ -73,7 +73,7 @@ cmake -S . -B build -G Ninja
 ```
 
 ##
-> Use ```-DCMAKE_BUILD_TYPE=Release``` if you want release build type instead of debug.**
+> Use ```-DCMAKE_BUILD_TYPE=Release``` if you want release build type instead of debug.
 
 ### 3. Build
 
