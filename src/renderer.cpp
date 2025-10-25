@@ -1,3 +1,5 @@
+#include "turtle_impl.hpp"
+#include "color.hpp"
 #include "turtle.hpp"
 #include "shaders/shaders.hpp"
 #include <string.h>
@@ -6,8 +8,6 @@
 #include <thread>
 #include "glad/glad.h"
 #include <GLFW/glfw3.h>
-#include <cmath>
-#include <cstdint>
 
 #ifdef DEBUG
     #include <algorithm>
@@ -100,11 +100,11 @@ static float* distance;
 static uint64_t* current_line;
 static bool* cpyData;
 
-inline bool turtle_step(const Turtle& turtle, const uint64_t t, const uint64_t p,
+inline bool turtle_step(const TurtleImpl& turtle, const uint64_t t, const uint64_t p,
     const std::chrono::high_resolution_clock::time_point& current_time,
     const std::chrono::high_resolution_clock::time_point& startTime
 ) {
-    const std::vector<Point>& points = turtle.get_points();
+    const std::vector<Point>& points = turtle.points;
     uint64_t line_id = current_line[t];
 
     if (cpyData[t]) {
@@ -189,10 +189,10 @@ void mainloop(uint32_t framerate, uint32_t multisample) {
     glDepthFunc(GL_LESS);
     glEnable(GL_MULTISAMPLE);
 
-    const uint64_t num_turtles = Turtle::turtles().size();
+    const uint64_t num_turtles = all_turtles.size();
     uint64_t n = 0;
     for (int t = 0; t < num_turtles; ++t) {
-        n += Turtle::turtles()[t]->get_points().size() - 1;
+        n += all_turtles[t].points.size() - 1;
     }
     const uint64_t total_num_lines = n;
 
@@ -241,9 +241,8 @@ void mainloop(uint32_t framerate, uint32_t multisample) {
     while (!glfwWindowShouldClose(window)) {
         auto current_time = clock::now();
         for (int t = 0; t < num_turtles; ++t) {
-            Turtle turtle = *Turtle::turtles()[t];
-            for (uint64_t p = step[t]; p + 1 < turtle.get_points().size(); ++p) {
-                const std::vector<Point> points = turtle.get_points();
+            TurtleImpl& turtle = all_turtles[t];
+            for (uint64_t p = step[t]; p + 1 < turtle.points.size(); ++p) {
                 if (turtle_step(
                     turtle, t, p,
                     current_time, startTime

@@ -2,6 +2,9 @@
 SET TESTNAME=%1
 IF "%TESTNAME%"=="" SET TESTNAME=test
 
+SET MODE=%2
+@REM IF "%MODE%"=="" SET MODE=run
+
 SET ROOT=%~dp0
 
 clang++ "%ROOT%\test\%TESTNAME%.cpp" ^
@@ -19,10 +22,17 @@ IF %ERRORLEVEL% NEQ 0 (
 
 SET PATH=%PATH%;%ROOT%\build;
 
-"%ROOT%\test\%TESTNAME%.exe"
+IF /I "%MODE%"=="lldb" (
+    lldb "%ROOT%\test\%TESTNAME%.exe"
+) ELSE (
+    "%ROOT%\test\%TESTNAME%.exe"
+)
+
+@REM "%ROOT%\test\%TESTNAME%.exe"
 
 SET RUNERROR=%ERRORLEVEL%
 echo.
 echo Program exited with error code %RUNERROR%.
+echo.
 
 del "%ROOT%\test\%TESTNAME%.exe"

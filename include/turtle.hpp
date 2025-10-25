@@ -2,32 +2,13 @@
 
 #include "color.hpp"
 #include <cstdint>
-#include <vector>
 #include "turtle_api.hpp"
 
-struct Point {
-    float x = 0.0f;
-    float y = 0.0f;
-    float angle = 0.0f;
-    uint32_t rgba = 0x000000FF;
-    float thickness = 1;
-    uint32_t fill_rgba = 0x00000000;
-};
-
 class Turtle {
-protected:
-    static std::vector<Turtle*> all_turtles;
-
-    std::vector<Point> points = {Point{}};
-
+private:
+    const uint32_t id;
 public:
-    float speed = 100;
-    uint32_t rgba = 0x000000FF;
-
     TURTLE_API Turtle();
-
-    static const std::vector<Turtle*>& turtles();
-    const std::vector<Point>& get_points() const;
 
     TURTLE_API void forward(float d);
     TURTLE_API void backward(float d);
