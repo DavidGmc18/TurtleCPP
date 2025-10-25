@@ -2,6 +2,7 @@
 #include "color.hpp"
 #include "turtle.hpp"
 #include "shaders/shaders.hpp"
+#include <cmath>
 #include <string.h>
 #include <chrono>
 #include <iostream>
