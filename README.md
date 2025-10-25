@@ -80,3 +80,25 @@ cmake -S . -B build -G Ninja
 ```
 cmake --build build
 ```
+
+### 4. Run test (optional)
+
+**Windows**
+```
+.\test.bat <testname>
+```
+
+**MacOS**
+```
+chmod +x ./test_clang.sh
+./test_clang.sh <testname>
+```
+
+**Linux**
+```
+chmod +x ./test.sh
+./test.sh <testname>
+```
+
+###
+> ```<testname>``` is the name of the C++ test file inside the /test folder without the .cpp extension. For example, to run test.cpp on Windows ```.\test.bat test```
