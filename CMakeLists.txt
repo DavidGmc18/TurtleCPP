@@ -1,8 +1,23 @@
 cmake_minimum_required(VERSION 3.22)
+
+if(WIN32 AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+    set(CMAKE_TOOLCHAIN_FILE "$ENV{USERPROFILE}/vcpkg/scripts/buildsystems/vcpkg.cmake")
+endif()
+
 project(Turtle LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+if((WIN32 OR APPLE) AND NOT DEFINED CMAKE_C_COMPILER)
+    set(CMAKE_C_COMPILER clang)
+endif()
+if((WIN32 OR APPLE) AND NOT DEFINED CMAKE_CXX_COMPILER)
+    set(CMAKE_CXX_COMPILER clang++)
+endif()
+if(NOT DEFINED CMAKE_EXPORT_COMPILE_COMMANDS)
+    set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+endif()
 
 include(CheckSymbolExists)
 check_symbol_exists(M_PI "math.h" HAVE_M_PI)
