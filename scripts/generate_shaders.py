@@ -1,7 +1,7 @@
 import os
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
-shaders_dir = os.path.join(script_dir, "../src/shaders")
+shaders_dir = os.path.join(script_dir, "../shaders")
 output_path = os.path.join(script_dir, "../generated/shaders_src.cpp")
 
 with open(output_path, "w") as f:
