@@ -3,6 +3,8 @@
 #include "turtle/turtle.hpp"
 #include "window.hpp"
 #include <chrono>
+#include <cmath>
+#include <cstring>
 #include <iostream>
 #include <thread>
 
