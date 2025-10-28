@@ -1,4 +1,4 @@
-file(WRITE "${OUTPUT_CPP}" "#include \"../src/shaders/shaders.hpp\"\n")
+file(WRITE "${OUTPUT_CPP}" "#include \"../src/shaders.hpp\"\n")
 
 separate_arguments(INPUT_SHADERS_LIST NATIVE_COMMAND "${INPUT_SHADERS}")
 

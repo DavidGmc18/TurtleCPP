@@ -1,22 +1,18 @@
 #include "turtle_impl.hpp"
 #include "color.hpp"
 #include "turtle.hpp"
-#include "shaders/shaders.hpp"
-#include <cmath>
-#include <string.h>
+#include "window.hpp"
 #include <chrono>
 #include <iostream>
 #include <thread>
-#include "glad/glad.h"
-#include <GLFW/glfw3.h>
 
 #ifdef DEBUG
     #include <algorithm>
     #include <numeric>
 #endif
 
-static int screen_x = 800;
-static int screen_y = 600;
+int screen_x = 800;
+int screen_y = 600;
 static float screen_r = 1.0f;
 static float screen_g = 1.0f;
 static float screen_b = 1.0f;
@@ -31,67 +27,6 @@ void bgcolor(Color color) {
     screen_g = float((color.rgba >> 16) & 0xFF) / 255.0f;
     screen_b = float((color.rgba >> 8) & 0xFF) / 255.0f;
 }
-
-void create_window(GLFWwindow** window, uint32_t& framerate, uint32_t multisample) {
-    if (!glfwInit()) {
-        std::cerr << "Failed to initialize GLFW\n";
-        return;
-    }
-    
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_SAMPLES, multisample);
-   
-    #ifdef __APPLE__
-        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    #endif
-
-    *window = glfwCreateWindow(screen_x, screen_y, "Turtle", nullptr, nullptr);
-    if (!*window) {
-        std::cerr << "Failed to create GLFW window\n";
-        glfwTerminate();
-        return;
-    }
-
-    glfwMakeContextCurrent(*window);
-    glfwSwapInterval(1);  // VSync
-
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-        std::cerr << "Failed to initialize GLAD\n";
-        glfwTerminate();
-        return;
-    }
-
-    if (framerate == 0) {
-        GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-        if (!monitor) {
-            std::cerr << "No primary monitor found\n";
-            glfwTerminate();
-            return;
-        }
-
-        const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-        if (!mode) {
-            std::cerr << "Could not get video mode\n";
-            glfwTerminate();
-            return;
-        }
-
-        framerate = mode->refreshRate;
-
-        if (framerate == 0) {
-            framerate = 60;
-            printf("Automatic framerate detection failed, defaulting to %iHz\n", framerate);
-        } else {
-            #ifdef DEBUG
-            printf("Automatically detected framerate: %iHz\n", framerate);
-            #endif
-        }
-    }
-}
-
-constexpr uint32_t VECTOR_SIZE = 11;
 
 static uint64_t num_lines;
 static uint64_t* step;
@@ -165,8 +100,7 @@ inline bool turtle_step(const TurtleImpl& turtle, const uint64_t t, const uint64
 }
 
 void mainloop(uint32_t framerate, uint32_t multisample) {
-    GLFWwindow* window = nullptr;
-    create_window(&window, framerate, multisample);
+    create_window(framerate, multisample);
 
     #ifdef DEBUG
         std::cout << "OpenGL version: " << glGetString(GL_VERSION) << "\n";
@@ -174,21 +108,6 @@ void mainloop(uint32_t framerate, uint32_t multisample) {
         int frameIndex = 0;
         float frameTimes[FRAMETIMES_SIZE] = {};
     #endif
-
-    GLuint shaderProgram = createShaderProgram(shader_vert_src, shader_geom_src, shader_frag_src);
-    GLuint locX = glGetUniformLocation(shaderProgram, "screen_x");
-    GLuint locY = glGetUniformLocation(shaderProgram, "screen_y");
-    GLuint w_uniform = glGetUniformLocation(shaderProgram, "w");
-    glUseProgram(shaderProgram);
-    glUniform1f(locX, float(screen_x));
-    glUniform1f(locY, float(screen_y));
-
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
-    glEnable(GL_MULTISAMPLE);
 
     const uint64_t num_turtles = all_turtles.size();
     uint64_t n = 0;
@@ -207,30 +126,7 @@ void mainloop(uint32_t framerate, uint32_t multisample) {
 
     memset(cpyData, true, num_turtles * sizeof(bool));
 
-    GLuint vao, vbo;
-    glGenVertexArrays(1, &vao);
-    glGenBuffers(1, &vbo);
-
-    glBindVertexArray(vao);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, total_num_lines * VECTOR_SIZE * sizeof(float), nullptr, GL_DYNAMIC_DRAW);
-
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, VECTOR_SIZE * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, VECTOR_SIZE * sizeof(float), (void*)(2 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-    glVertexAttribIPointer(2, 1, GL_UNSIGNED_INT, VECTOR_SIZE * sizeof(float), (void*)(4 * sizeof(float)));
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, VECTOR_SIZE * sizeof(float), (void*)(5*sizeof(float)));
-    glEnableVertexAttribArray(3);
-    glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, VECTOR_SIZE * sizeof(float), (void*)(6*sizeof(float)));
-    glEnableVertexAttribArray(4);
-    glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, VECTOR_SIZE * sizeof(float), (void*)(7 * sizeof(float)));
-    glEnableVertexAttribArray(5);
-    glVertexAttribIPointer(6, 1, GL_UNSIGNED_INT, VECTOR_SIZE * sizeof(float), (void*)(10 * sizeof(float)));
-    glEnableVertexAttribArray(6);
-
-    glBindVertexArray(0);
+    gl_setup(total_num_lines);
 
     float w = 1.0f; 
 
