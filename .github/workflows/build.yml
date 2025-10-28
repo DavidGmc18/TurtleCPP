@@ -1,33 +1,69 @@
-name: Build Turtle (Ubuntu)
+name: Build Turtle
 
 on:
   workflow_dispatch:
 
 jobs:
-  build-linux:
-    runs-on: ubuntu-latest
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install build tools
+      # Ubuntu
+      - name: Install build tools (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
         run: |
-            sudo apt-get update
-            sudo apt-get install -y cmake g++
-            sudo apt install libglfw3-dev
-            python3 -m pip install matplotlib
+          sudo apt-get update
+          sudo apt-get install -y cmake g++ libglfw3-dev
+          python3 -m pip install matplotlib
+        shell: bash
 
-      - name: Configure CMake
+      # Windows
+      - name: Install build tools (Windows)
+        if: matrix.os == 'windows-latest'
         run: |
-          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+          choco install llvm -y
+          git clone https://github.com/microsoft/vcpkg.git
+          .\vcpkg\bootstrap-vcpkg.bat
+          .\vcpkg\vcpkg install glfw3:x64-windows
+          .\vcpkg\vcpkg integrate install
+          python -m pip install matplotlib
+        shell: pwsh
+
+      # macOS
+      - name: Install build tools (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew update
+          brew install cmake clang
+          python3 -m pip install matplotlib
+        shell: bash
+
+      - name: Configure CMake (Linux + macOS)
+        if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+        shell: bash
+
+      - name: Configure CMake (Windows)
+        if: matrix.os == 'windows-latest'
+        run: cmake -S . -B build -G "Ninja" -DCMAKE_BUILD_TYPE=Release
+        shell: pwsh
 
       - name: Build
-        run: |
-          cmake --build build
+        run: cmake --build build --config Release
+        shell: bash
 
-      - name: Upload
+      - name: Upload shared library
         uses: actions/upload-artifact@v4
         with:
-          name: turtle-linux
-          path: build/libturtle.so
+          name: turtle-${{ matrix.os }}
+          path: |
+            include/**
+            build/libturtle.so
+            build/libturtle.dylib
+            build/Release/turtle.dll
