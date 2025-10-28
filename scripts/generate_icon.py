@@ -1,12 +1,8 @@
 from PIL import Image
-import os
 
-output_path = "../generated/icon.hpp"
-os.makedirs(os.path.dirname(output_path), exist_ok=True) 
-
-im = Image.open("../assets/turtle-icon-size_256.png").convert("RGBA")
-width, height = im.size
-pixels = list(im.getdata())
+image = Image.open("../assets/turtle-icon-size_256.png").convert("RGBA")
+width, height = image.size
+pixels = list(image.getdata())
 
 with open("../generated/icon.hpp", "w") as f:
     f.write("#pragma once\n\n")

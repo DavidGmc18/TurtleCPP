@@ -1,5 +1,6 @@
 /build
 /.cache
+/generated
 
 *.so
 *.dll

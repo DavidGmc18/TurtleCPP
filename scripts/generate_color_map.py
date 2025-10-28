@@ -1,8 +1,4 @@
 import matplotlib.colors as mcolors
-import os
-
-output_path = "../generated/color_map.hpp"
-os.makedirs(os.path.dirname(output_path), exist_ok=True) 
 
 with open("../generated/color_map.hpp", "w") as f:
     f.write("#pragma once\n\n")
@@ -13,5 +9,6 @@ with open("../generated/color_map.hpp", "w") as f:
 
     for color in list(mcolors.CSS4_COLORS):
         f.write('    {"' + color + '", 0x' + mcolors.CSS4_COLORS[color].split("#")[1] + "FF},\n")
+        
     f.write("};\n\n")
     f.write("}")

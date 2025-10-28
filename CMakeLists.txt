@@ -20,21 +20,35 @@ if(NOT DEFINED CMAKE_EXPORT_COMPILE_COMMANDS)
 endif()
 
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
+
+set(GENERATED_DIR ${CMAKE_CURRENT_SOURCE_DIR}/generated)
+set(COLOR_MAP_HPP ${CMAKE_CURRENT_SOURCE_DIR}/generated/color_map.hpp)
+set(ICON_HPP ${CMAKE_CURRENT_SOURCE_DIR}/generated/icon.hpp)
+set(SHADERS_SRC ${CMAKE_CURRENT_SOURCE_DIR}/generated/shaders_src.cpp)
+
+file(MAKE_DIRECTORY ${GENERATED_DIR})
+
 add_custom_command(
-    OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/src/generated/color_map.hpp
+    OUTPUT ${COLOR_MAP_HPP}
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/generate_color_map.py
     DEPENDS ${CMAKE_SOURCE_DIR}/scripts/generate_color_map.py
     COMMENT "Generating color_map.hpp using Python"
 )
 add_custom_command(
-    OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/src/generated/icon.hpp
+    OUTPUT ${ICON_HPP}
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/generate_icon.py
     DEPENDS ${CMAKE_SOURCE_DIR}/scripts/generate_icon.py
     COMMENT "Generating icon.hpp using Python"
 )
-add_custom_target(generate_headers DEPENDS 
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/generated/color_map.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/generated/icon.hpp
+add_custom_command(
+    OUTPUT ${SHADERS_SRC}
+    COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/generate_shaders.py
+    DEPENDS ${CMAKE_SOURCE_DIR}/scripts/generate_shaders.py
+    COMMENT "Generating shaders_src.cpp using Python"
+)
+
+add_custom_target(generate_files ALL
+    DEPENDS ${COLOR_MAP_HPP} ${ICON_HPP} ${SHADERS_SRC}
 )
 
 include(CheckSymbolExists)
@@ -43,24 +57,10 @@ if(NOT HAVE_M_PI)
     add_compile_definitions(M_PI=3.14159265358979323846)
 endif()
 
-set(SHADER_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/shaders")
-file(GLOB SHADER_FILES "${SHADER_DIR}/*")
-set(GENERATED_CPP "${CMAKE_CURRENT_BINARY_DIR}/shaders_gen.cpp")
-add_custom_command(
-    OUTPUT "${GENERATED_CPP}"
-    COMMAND ${CMAKE_COMMAND}
-        -DINPUT_SHADERS="${SHADER_FILES}"
-        -DOUTPUT_CPP=${GENERATED_CPP}
-        -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/gen_shaders.cmake
-    DEPENDS ${SHADER_FILES} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/gen_shaders.cmake
-    COMMENT "Generating shaders_gen.cpp"
-)
-
 include_directories(${CMAKE_SOURCE_DIR}/include)
 file(GLOB_RECURSE SRC_FILES ${CMAKE_SOURCE_DIR}/src/*.cpp ${CMAKE_SOURCE_DIR}/src/*.c)
-add_library(turtle SHARED ${SRC_FILES} "${GENERATED_CPP}")
-
-add_dependencies(turtle generate_headers)
+add_library(turtle SHARED ${SRC_FILES} ${SHADERS_SRC})
+add_dependencies(turtle generate_files)
 
 target_compile_definitions(turtle PRIVATE $<$<CONFIG:Debug>:DEBUG>)
 target_compile_options(turtle PRIVATE
