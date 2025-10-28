@@ -26,15 +26,16 @@ if(NOT HAVE_M_PI)
 endif()
 
 set(SHADER_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/shaders")
+file(GLOB SHADER_FILES "${SHADER_DIR}/*")
 set(GENERATED_CPP "${CMAKE_CURRENT_BINARY_DIR}/shaders_gen.cpp")
 add_custom_command(
     OUTPUT "${GENERATED_CPP}"
     COMMAND ${CMAKE_COMMAND}
-        -DINPUT_DIR=${SHADER_DIR}
+        -DINPUT_SHADERS="${SHADER_FILES}"
         -DOUTPUT_CPP=${GENERATED_CPP}
         -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/gen_shaders.cmake
     DEPENDS ${SHADER_FILES} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/gen_shaders.cmake
-    COMMENT "Generating shaders_gen.c"
+    COMMENT "Generating shaders_gen.cpp"
 )
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
@@ -57,10 +58,8 @@ elseif (WIN32)
     target_compile_definitions(turtle PRIVATE TURTLE_EXPORTS)
     target_link_libraries(turtle PRIVATE glfw)
 elseif(APPLE)
-    # Try to find GLFW via Homebrew or system installation
     find_package(glfw3 CONFIG QUIET)
     if(NOT glfw3_FOUND)
-        # Fallback: look for pkg-config if Homebrew didn't install a CMake config
         find_package(PkgConfig REQUIRED)
         pkg_check_modules(GLFW REQUIRED glfw3)
         include_directories(${GLFW_INCLUDE_DIRS})
@@ -69,8 +68,6 @@ elseif(APPLE)
     else()
         target_link_libraries(turtle PRIVATE glfw)
     endif()
-
-    # Link macOS frameworks required by GLFW/OpenGL
     target_link_libraries(turtle PRIVATE
         "-framework Cocoa"
         "-framework IOKit"
