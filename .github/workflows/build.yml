@@ -16,6 +16,7 @@ jobs:
             sudo apt-get update
             sudo apt-get install -y cmake g++
             sudo apt install libglfw3-dev
+            python3 -m pip install matplotlib
 
       - name: Configure CMake
         run: |
