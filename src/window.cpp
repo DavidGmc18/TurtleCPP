@@ -1,6 +1,7 @@
 #include "window.hpp"
 #include "shaders.hpp"
 #include <stdio.h>
+#include "../generated/icon.hpp"
 
 namespace turtle {
 
@@ -31,6 +32,12 @@ void create_window(uint32_t& framerate, uint32_t multisample) {
         glfwTerminate();
         return;
     }
+
+    GLFWimage icon;
+    icon.width = ICON_WIDTH;
+    icon.height = ICON_HEIGHT;
+    icon.pixels = (unsigned char*)ICON_PIXELS;
+    glfwSetWindowIcon(window, 1, &icon);
 
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);  // VSync

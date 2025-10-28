@@ -19,6 +19,24 @@ if(NOT DEFINED CMAKE_EXPORT_COMPILE_COMMANDS)
     set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 endif()
 
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
+add_custom_command(
+    OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/src/generated/color_map.hpp
+    COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/generate_color_map.py
+    DEPENDS ${CMAKE_SOURCE_DIR}/scripts/generate_color_map.py
+    COMMENT "Generating color_map.hpp using Python"
+)
+add_custom_command(
+    OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/src/generated/icon.hpp
+    COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/generate_icon.py
+    DEPENDS ${CMAKE_SOURCE_DIR}/scripts/generate_icon.py
+    COMMENT "Generating icon.hpp using Python"
+)
+add_custom_target(generate_headers DEPENDS 
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/generated/color_map.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/generated/icon.hpp
+)
+
 include(CheckSymbolExists)
 check_symbol_exists(M_PI "math.h" HAVE_M_PI)
 if(NOT HAVE_M_PI)
@@ -41,6 +59,8 @@ add_custom_command(
 include_directories(${CMAKE_SOURCE_DIR}/include)
 file(GLOB_RECURSE SRC_FILES ${CMAKE_SOURCE_DIR}/src/*.cpp ${CMAKE_SOURCE_DIR}/src/*.c)
 add_library(turtle SHARED ${SRC_FILES} "${GENERATED_CPP}")
+
+add_dependencies(turtle generate_headers)
 
 target_compile_definitions(turtle PRIVATE $<$<CONFIG:Debug>:DEBUG>)
 target_compile_options(turtle PRIVATE
