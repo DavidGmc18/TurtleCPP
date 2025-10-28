@@ -3,6 +3,8 @@
 #include <cstdint>
 #include <vector>
 
+namespace turtle {
+
 struct Point {
     float x = 0.0f;
     float y = 0.0f;
@@ -19,3 +21,5 @@ struct TurtleImpl {
 };
 
 extern std::vector<TurtleImpl> all_turtles;
+
+}

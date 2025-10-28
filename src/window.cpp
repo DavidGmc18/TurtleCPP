@@ -2,6 +2,8 @@
 #include "shaders.hpp"
 #include <stdio.h>
 
+namespace turtle {
+
 GLFWwindow* window = nullptr;
 
 GLuint vao = 0;
@@ -106,4 +108,6 @@ void gl_setup(uint64_t total_num_lines) {
     glEnableVertexAttribArray(6);
 
     glBindVertexArray(0);
+}
+
 }

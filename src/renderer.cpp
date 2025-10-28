@@ -1,6 +1,6 @@
 #include "turtle_impl.hpp"
-#include "color.hpp"
-#include "turtle.hpp"
+#include "turtle/color.hpp"
+#include "turtle/turtle.hpp"
 #include "window.hpp"
 #include <chrono>
 #include <iostream>
@@ -10,6 +10,8 @@
     #include <algorithm>
     #include <numeric>
 #endif
+
+namespace turtle {
 
 int screen_x = 800;
 int screen_y = 600;
@@ -200,4 +202,6 @@ void mainloop(uint32_t framerate, uint32_t multisample) {
     delete[]distance;
     delete[]current_line;
     delete[]cpyData;
+}
+
 }

@@ -2,7 +2,8 @@
 
 #include "color.hpp"
 #include <cstdint>
-#include "turtle_api.hpp"
+
+namespace turtle {
 
 class Turtle {
 private:
@@ -40,3 +41,5 @@ TURTLE_API void screen_size(int x, int y);
 TURTLE_API void bgcolor(Color color);
 
 TURTLE_API void mainloop(uint32_t framerate = 0, uint32_t multisample = 4);
+
+}

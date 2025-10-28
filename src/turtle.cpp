@@ -1,8 +1,10 @@
-#include "turtle.hpp"
+#include "turtle/turtle.hpp"
 #include "turtle_impl.hpp"
-#include "color.hpp"
+#include "turtle/color.hpp"
 #include <cmath>
 
+namespace turtle {
+    
 std::vector<TurtleImpl> all_turtles;
 
 Turtle::Turtle(): id(all_turtles.size()) {
@@ -98,4 +100,6 @@ void Turtle::end_fill() {
 void Turtle::fillcolor(Color color) {
     uint8_t alpha = all_turtles[id].points.back().fill_rgba & 0x000000FF;
     all_turtles[id].points.back().fill_rgba = (color.rgba & 0xFFFFFF00) | alpha;
+}
+
 }

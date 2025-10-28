@@ -17,5 +17,5 @@ foreach(SHADER_FILE IN LISTS INPUT_SHADERS_LIST)
     string(REPLACE "\"" "\\\"" ESCAPED_CONTENTS "${CONTENTS}")
     string(REPLACE "\n" "\\n\"\n\"" ESCAPED_CONTENTS "${ESCAPED_CONTENTS}")
 
-    file(APPEND "${OUTPUT_CPP}" "const char* ${NAME}_${EXT_NO_DOT}_src = \"${ESCAPED_CONTENTS}\";\n\n")
+    file(APPEND "${OUTPUT_CPP}" "const char* turtle::${NAME}_${EXT_NO_DOT}_src = \"${ESCAPED_CONTENTS}\";\n\n")
 endforeach()

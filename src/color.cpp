@@ -1,4 +1,4 @@
-#include "color.hpp"
+#include "turtle/color.hpp"
 
 #include <algorithm>
 #include <cctype>
@@ -6,6 +6,8 @@
 #include <string>
 #include <unordered_map>
 
+namespace turtle {
+    
 static std::unordered_map<std::string, uint32_t> color_map = {
     {"aliceblue", 0xF0F8FFFF}, {"antiquewhite", 0xFAEBD7FF}, {"aqua", 0x00FFFFFF}, {"aquamarine", 0x7FFFD4FF}, {"azure", 0xF0FFFFFF},
     {"beige", 0xF5F5DCFF}, {"bisque", 0xFFE4C4FF}, {"black", 0x000000FF}, {"blanchedalmond", 0xFFEBCDFF}, {"blue", 0x0000FFFF},
@@ -64,4 +66,6 @@ Color::Color(const char* color) {
     } else {
         std::cerr << "WARN: '" << color_lower << "' is not recognized color\n";
     }
+}
+
 }

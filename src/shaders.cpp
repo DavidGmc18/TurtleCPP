@@ -1,6 +1,8 @@
 #include "shaders.hpp"
 #include <stdio.h>
 
+namespace turtle {
+
 GLuint compileShader(GLenum type, const char* src) {
     GLuint shader = glCreateShader(type);
     glShaderSource(shader, 1, &src, nullptr);
@@ -39,4 +41,6 @@ GLuint createShaderProgram(const char* vertexSrc, const char* geometrySrc, const
     glDeleteShader(geometryShader);
     glDeleteShader(fragmentShader);
     return program;
+}
+
 }
