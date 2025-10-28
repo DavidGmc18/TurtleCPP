@@ -1,4 +1,6 @@
-#include "turtle.hpp"
+#include "turtle/turtle.hpp"
+
+using namespace turtle;
 
 int main() {
     Turtle t;

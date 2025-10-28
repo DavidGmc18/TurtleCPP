@@ -1,4 +1,6 @@
-#include "turtle.hpp"
+#include "turtle/turtle.hpp"
+
+using namespace turtle;
 
 void srpienski_triangle(Turtle& t, float size, int n) {
     if (n < 0) {
