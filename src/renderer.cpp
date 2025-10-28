@@ -186,10 +186,13 @@ void mainloop(uint32_t framerate, uint32_t multisample) {
                 printf("Frame time(%i) ->  MIN %.3fms  AVG %.3fms  MAX %.3fms\n", FRAMETIMES_SIZE, min, avg, max);
             }
             GLenum err = glGetError();
+            bool flag = false;
             while (err != GL_NO_ERROR) {
                 std::cerr << "OpenGL error: " << err << "\n";
                 err = glGetError();
+                flag = true;
             }
+            if (flag) exit(EXIT_FAILURE);
         #endif
     }
 
