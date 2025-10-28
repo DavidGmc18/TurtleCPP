@@ -40,10 +40,11 @@ add_custom_command(
     DEPENDS ${CMAKE_SOURCE_DIR}/scripts/generate_icon.py
     COMMENT "Generating icon.hpp using Python"
 )
+file(GLOB SHADER_FILES "${CMAKE_SOURCE_DIR}/shaders/*")
 add_custom_command(
     OUTPUT ${SHADERS_SRC}
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/generate_shaders.py
-    DEPENDS ${CMAKE_SOURCE_DIR}/scripts/generate_shaders.py
+    DEPENDS ${CMAKE_SOURCE_DIR}/scripts/generate_shaders.py ${SHADER_FILES}
     COMMENT "Generating shaders_src.cpp using Python"
 )
 

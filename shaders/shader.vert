@@ -11,35 +11,31 @@ layout(location = 6) in uint aFillColor;
 out vec2 vPos0;
 out vec2 vPos1;
 out vec4 vertexColor;
-out vec2 vertexThickness;
+out float vertexThickness;
 out float vertexDepth;
 out vec3 vFillPos;
 out vec4 vertexFillColor;
 
-uniform float screen_x;
-uniform float screen_y;
 uniform float w;
 
 void main() {
-    vec2 scale = vec2(2 / screen_x, 2 / screen_y);
-
-    vPos0 = aPos0 * scale;
-    vPos1 = aPos1 * scale;
+    vPos0 = aPos0;
+    vPos1 = aPos1;
     vertexColor = vec4(
         float((aColor >> 24) & uint(0xFF)),
         float((aColor >> 16) & uint(0xFF)),
         float((aColor >> 8) & uint(0xFF)),
         float(aColor & uint(0xFF))
-    ) / 255.0;
-    vertexThickness = aThickness * scale;
+    ) / 0xFF;
+    vertexThickness = aThickness / 2;
     vertexDepth = aDepth / w;
-    vFillPos = aFillPos * vec3(scale, 1.0 / w);
+    vFillPos = aFillPos * vec3(1.0, 1.0, 1.0 / w);
     vertexFillColor = vertexFillColor = vec4(
         float((aFillColor >> 24) & uint(0xFF)),
         float((aFillColor >> 16) & uint(0xFF)),
         float((aFillColor >> 8) & uint(0xFF)),
         float(aFillColor & uint(0xFF))
-    ) / 255.0;
+    ) / 0xFF;
 
-    gl_Position = vec4(aPos0 * scale, aDepth / w, 1.0);
+    gl_Position = vec4(aPos0, aDepth / w, 1.0);
 }
