@@ -96,13 +96,8 @@ cmake --build build
 .\test.bat <testname>
 ```
 
-**MacOS**
-```
-chmod +x ./test_clang.sh
-./test_clang.sh <testname>
-```
 
-**Linux**
+**Linux & MacOS**
 ```
 chmod +x ./test.sh
 ./test.sh <testname>
